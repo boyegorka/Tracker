@@ -11,13 +11,21 @@ protocol TrackersPresenterProtocol {
     var view: TrackersViewControllerProtocol? { get }
     var currentDate: Date { get set }
     var categories: [TrackerCategory] { get }
+    var search: String { get set }
     func addTracker(_ tracker: Tracker, at category: TrackerCategory)
+    func numberOfSections() -> Int?
+    func numberOfItemsInSection(section: Int) -> Int
+    func updateCategories()
+    func completeTracker(_ complete: Bool, tracker: Tracker)
+    func trackerViewModel(at indexPath: IndexPath) -> TrackerCellViewModel
 }
 
 final class TrackersPresenter: TrackersPresenterProtocol {
+    
     var categories: [TrackerCategory] = []
     weak var view: TrackersViewControllerProtocol?
     private let service = TrackerService()
+    
     var search: String = "" {
         didSet {
             updateCategories()
@@ -28,6 +36,8 @@ final class TrackersPresenter: TrackersPresenterProtocol {
             updateCategories()
         }
     }
+    
+    
     
     func addTracker(_ tracker: Tracker, at category: TrackerCategory) {
         service.addTracker(tracker, at: category)
@@ -52,5 +62,19 @@ final class TrackersPresenter: TrackersPresenterProtocol {
     
     func countRecordsTracker(_ tracker: Tracker) -> Int {
         service.completedTrackers.filter({ $0.id == tracker.id }).count
+    }
+    
+    func numberOfSections() -> Int? {
+        view?.setupEmptyScreen()
+        return categories.count
+    }
+    
+    func numberOfItemsInSection(section: Int) -> Int {
+        categories[section].trackers.count
+    }
+    
+    func trackerViewModel(at indexPath: IndexPath) -> TrackerCellViewModel {
+        let tracker = categories[indexPath.section].trackers[indexPath.row]
+        return TrackerCellViewModel(tracker: tracker, isCompleted: isCompletedTracker(tracker), daysCounter: countRecordsTracker(tracker))
     }
 }

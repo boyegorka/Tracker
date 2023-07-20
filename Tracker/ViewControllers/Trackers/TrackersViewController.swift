@@ -8,12 +8,13 @@
 import UIKit
 
 protocol TrackersViewControllerProtocol: AnyObject {
-    var presenter: TrackersPresenter? { get }
+    var presenter: TrackersPresenterProtocol? { get }
+    func setupEmptyScreen()
 }
 
 final class TrackersViewController: UIViewController, TrackersViewControllerProtocol, TrackerTypeDelegate, NewHabitDelegate, TrackerCollectionViewCellDelegate {
     
-    var presenter: TrackersPresenter?
+    var presenter: TrackersPresenterProtocol?
     
     enum Contstants {
         static let cellIdentifier = "TrackerCell"
@@ -70,7 +71,7 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
         datePicker.preferredDatePickerStyle = .compact
         datePicker.datePickerMode = .date
         datePicker.addTarget(self, action: #selector(setDateForTrackers), for: .valueChanged)
-        
+        datePicker.maximumDate = Date()
         let dateButton = UIBarButtonItem(customView: datePicker)
         
         return dateButton
@@ -126,7 +127,7 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
         navigationBar.topItem?.setRightBarButton(datePickerButton, animated: true)
     }
     
-    private func setupEmptyScreen() {
+    func setupEmptyScreen() {
         emptyScreenView.isHidden = presenter?.categories.count ?? 0 > 0
         trackersCollectionView.isHidden = presenter?.categories.count == 0
     }
@@ -181,7 +182,7 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
     
     // MARK: - TrackerCollectionViewCellDelegate
     
-    func didComlete(_ complete: Bool, tracker: Tracker) {
+    func didComplete(_ complete: Bool, tracker: Tracker) {
         presenter?.completeTracker(complete, tracker: tracker)
     }
 }
@@ -189,12 +190,11 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
 extension TrackersViewController: UICollectionViewDataSource {
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        setupEmptyScreen()
-        return presenter?.categories.count ?? 0
+        presenter?.numberOfSections() ?? 0
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return presenter?.categories[section].trackers.count ?? 0
+        presenter?.numberOfItemsInSection(section: section) ?? 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -202,12 +202,8 @@ extension TrackersViewController: UICollectionViewDataSource {
               let presenter
         else { return UICollectionViewCell() }
         
-        let tracker = presenter.categories[indexPath.section].trackers[indexPath.row]
-        
-        cell.tracker = tracker
+        cell.viewModel = presenter.trackerViewModel(at: indexPath)
         cell.delegate = self
-        cell.comletedTracker = presenter.isCompletedTracker(tracker)
-        cell.daysCounter = presenter.countRecordsTracker(tracker)
         return cell
     }
 }

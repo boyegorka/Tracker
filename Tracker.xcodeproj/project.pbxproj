@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		CA5C51AB2A698DFA0078C7E8 /* TrackerCellViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA5C51AA2A698DFA0078C7E8 /* TrackerCellViewModel.swift */; };
 		CA6B256D2A5C547F00388BBF /* UIViewController+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA6B256C2A5C547F00388BBF /* UIViewController+Extension.swift */; };
 		CA6B256F2A5C76CC00388BBF /* TrackersPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA6B256E2A5C76CC00388BBF /* TrackersPresenter.swift */; };
 		CA6B25712A5C806500388BBF /* NewHabitPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA6B25702A5C806500388BBF /* NewHabitPresenter.swift */; };
@@ -35,6 +36,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		CA5C51AA2A698DFA0078C7E8 /* TrackerCellViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackerCellViewModel.swift; sourceTree = "<group>"; };
 		CA6B256C2A5C547F00388BBF /* UIViewController+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Extension.swift"; sourceTree = "<group>"; };
 		CA6B256E2A5C76CC00388BBF /* TrackersPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackersPresenter.swift; sourceTree = "<group>"; };
 		CA6B25702A5C806500388BBF /* NewHabitPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewHabitPresenter.swift; sourceTree = "<group>"; };
@@ -75,6 +77,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		CA5C51AC2A698E170078C7E8 /* Cells */ = {
+			isa = PBXGroup;
+			children = (
+				CABC08592A47428C008CC2E4 /* TrackerCollectionViewCell.swift */,
+				CA5C51AA2A698DFA0078C7E8 /* TrackerCellViewModel.swift */,
+			);
+			path = Cells;
+			sourceTree = "<group>";
+		};
 		CA6B25772A5DF61300388BBF /* Services */ = {
 			isa = PBXGroup;
 			children = (
@@ -107,8 +118,8 @@
 			children = (
 				CAC6C7BD2A1F1AE700E9ACC3 /* TrackersViewController.swift */,
 				CA6B256E2A5C76CC00388BBF /* TrackersPresenter.swift */,
-				CABC08592A47428C008CC2E4 /* TrackerCollectionViewCell.swift */,
 				CA6C91272A632B1600A4AE6D /* SupplementaryView.swift */,
+				CA5C51AC2A698E170078C7E8 /* Cells */,
 			);
 			path = Trackers;
 			sourceTree = "<group>";
@@ -308,6 +319,7 @@
 				CAAB0CCB2A4F9B9D00EBC766 /* TimetableViewController.swift in Sources */,
 				CAA8CC4D2A3CCB4800AE4AD3 /* UIColor+Extension.swift in Sources */,
 				CA6C912A2A633B6200A4AE6D /* TimetablePresenter.swift in Sources */,
+				CA5C51AB2A698DFA0078C7E8 /* TrackerCellViewModel.swift in Sources */,
 				CABC08642A4C7D2F008CC2E4 /* TrackerCategoryModel.swift in Sources */,
 				CABC08622A4C74BD008CC2E4 /* TrackerModel.swift in Sources */,
 				CAA8CC562A3D38AF00AE4AD3 /* TrackerTypeViewController.swift in Sources */,

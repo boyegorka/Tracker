@@ -8,20 +8,27 @@
 import UIKit
 
 protocol TrackerCollectionViewCellDelegate: AnyObject {
-    func didComlete(_ complete: Bool,  tracker: Tracker)
+    func didComplete(_ complete: Bool,  tracker: Tracker)
 }
 
 class TrackerCollectionViewCell: UICollectionViewCell {
     
     var delegate: TrackerCollectionViewCellDelegate?
     
-    var daysCounter: Int = 0 {
+    var viewModel: TrackerCellViewModel? {
+        didSet {
+            guard let viewModel else { return }
+            setupViewModel(viewModel: viewModel)
+        }
+    }
+    
+    private var daysCounter: Int = 0 {
         didSet {
             updateCounterLabel()
         }
     }
     
-    var tracker: Tracker? {
+    private var tracker: Tracker? {
         didSet {
             name.text = tracker?.name
             emoji.text = tracker?.emoji
@@ -30,20 +37,20 @@ class TrackerCollectionViewCell: UICollectionViewCell {
         }
     }
     
-    var comletedTracker: Bool = false {
+    private var comletedTracker: Bool = false {
         didSet {
             upadateButtonState()
         }
     }
     
-    lazy var rectangleView: UIView = {
+    private lazy var rectangleView: UIView = {
         let rectangleView = UIView()
         rectangleView.translatesAutoresizingMaskIntoConstraints = false
         rectangleView.layer.cornerRadius = 16
         return rectangleView
     }()
     
-    lazy var name: UILabel = {
+    private lazy var name: UILabel = {
         let name = UILabel()
         name.translatesAutoresizingMaskIntoConstraints = false
         name.textColor = .white
@@ -52,7 +59,7 @@ class TrackerCollectionViewCell: UICollectionViewCell {
         return name
     }()
     
-    lazy var emojiBackground: UIView = {
+    private lazy var emojiBackground: UIView = {
         let emojiBackground = UIView()
         emojiBackground.translatesAutoresizingMaskIntoConstraints = false
         emojiBackground.layer.cornerRadius = 15
@@ -60,7 +67,7 @@ class TrackerCollectionViewCell: UICollectionViewCell {
         return emojiBackground
     }()
     
-    lazy var emoji: UILabel = {
+    private lazy var emoji: UILabel = {
         let emoji = UILabel()
         emoji.translatesAutoresizingMaskIntoConstraints = false
         emoji.font = .systemFont(ofSize: 16)
@@ -68,14 +75,14 @@ class TrackerCollectionViewCell: UICollectionViewCell {
         return emoji
     }()
     
-    lazy var days: UILabel = {
+    private lazy var days: UILabel = {
         let days = UILabel()
         days.translatesAutoresizingMaskIntoConstraints = false
         days.font = .systemFont(ofSize: 12, weight: .medium)
         return days
     }()
     
-    lazy var counterButton: UIButton = {
+    private lazy var counterButton: UIButton = {
         let counterButton = UIButton()
         counterButton.translatesAutoresizingMaskIntoConstraints = false
         counterButton.layer.cornerRadius = 20
@@ -142,7 +149,7 @@ class TrackerCollectionViewCell: UICollectionViewCell {
         }
         comletedTracker = !comletedTracker
         guard let tracker else { return }
-        delegate?.didComlete(comletedTracker, tracker: tracker)
+        delegate?.didComplete(comletedTracker, tracker: tracker)
     }
     
     private func upadateButtonState() {
@@ -161,5 +168,12 @@ class TrackerCollectionViewCell: UICollectionViewCell {
     private func updateCounterLabel() {
         let daysLabelForCell = "\(daysCounter) дней"
         days.text = daysLabelForCell
+    }
+    
+    private func setupViewModel(viewModel: TrackerCellViewModel) {
+        daysCounter = viewModel.daysCounter
+        tracker = viewModel.tracker
+        comletedTracker = viewModel.isCompleted
+        
     }
 }

@@ -22,7 +22,6 @@ class TimetablePresenter: TimetablePresenterProtocol {
     
     var view: TimetableViewControllerProtocol
     var delegate: TimetableDelegate
-    
     var selectedWeekdays: [Int]
     let weekdays = FormatterDays.weekdays
     

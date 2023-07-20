@@ -62,7 +62,6 @@ final class TrackerService: TrackerServiceProtocol {
         let trackerToRecord = TrackerRecord(id: tracker.id, date: date)
         completedTrackers.insert(trackerToRecord)
         self.completedTrackers = completedTrackers
-        
     }
     
     func removeFromCompletedTrackers(tracker: Tracker, date: Date) {
