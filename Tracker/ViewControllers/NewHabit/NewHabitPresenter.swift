@@ -15,6 +15,8 @@ protocol NewHabitPresenterProtocol {
     var selectedCategory: TrackerCategory? { get }
     var schedule: [Int] { get set }
     var isValidForm: Bool { get }
+    var sheduleString: String { get }
+    var categoryName: String? { get }
     func createNewTracker()
 }
 
@@ -34,6 +36,16 @@ final class NewHabitPresenter: NewHabitPresenterProtocol {
     var schedule: [Int] = []
     var isValidForm: Bool {
         selectedCategory != nil && trackerName != nil && !schedule.isEmpty
+    }
+    var sheduleString: String {
+        if schedule.count == FormatterDays.weekdays.count {
+            return "Каждый день"
+        } else {
+            return schedule.map { FormatterDays.shortWeekday(at: $0)}.joined(separator: ", ")
+        }
+    }
+    var categoryName: String? {
+        selectedCategory?.name
     }
     
     init(type: TrackerType, categories: [TrackerCategory]) {

@@ -38,7 +38,7 @@ class StatisticsViewController: UIViewController {
     }
     
     private func setupStatisticsScreen() {
-        emptyScreenImage.image = UIImage(named: "EmptyScreenSmile")
+        emptyScreenImage.image = UIImage(named: "EmptyScreenSmileCrying")
         emptyScreenText.text = "Анализировать пока нечего"
         view.backgroundColor = .ypWhite
         setupNavigationBar()

@@ -75,6 +75,6 @@ final class TrackersPresenter: TrackersPresenterProtocol {
     
     func trackerViewModel(at indexPath: IndexPath) -> TrackerCellViewModel {
         let tracker = categories[indexPath.section].trackers[indexPath.row]
-        return TrackerCellViewModel(tracker: tracker, isCompleted: isCompletedTracker(tracker), daysCounter: countRecordsTracker(tracker))
+        return TrackerCellViewModel(tracker: tracker, isCompleted: isCompletedTracker(tracker), daysCounter: countRecordsTracker(tracker), isComplitionEnable: currentDate <= Date())
     }
 }

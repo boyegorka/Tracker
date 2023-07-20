@@ -14,6 +14,9 @@ protocol TrackersViewControllerProtocol: AnyObject {
 
 final class TrackersViewController: UIViewController, TrackersViewControllerProtocol, TrackerTypeDelegate, NewHabitDelegate, TrackerCollectionViewCellDelegate {
     
+    var comletedTracker: Bool = false
+    
+    
     var presenter: TrackersPresenterProtocol?
     
     enum Contstants {
@@ -37,21 +40,26 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
         return collectionView
     }()
     
+    private lazy var emptyScreenImage: UIImageView = {
+        let imageView = UIImageView()
+        imageView.image = UIImage(named: "EmptyScreenStar")
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        return imageView
+    }()
+    
+    private lazy var emptyScreenText: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.text = "Что будем отслеживать?"
+        label.font = UIFont.systemFont(ofSize: 12, weight: .medium)
+        return label
+    }()
+    
+    
     private lazy var emptyScreenView: UIView = {
         let view = UIView()
         
         view.translatesAutoresizingMaskIntoConstraints = false
-        
-        let emptyScreenImage = UIImageView()
-        emptyScreenImage.image = UIImage(named: "EmptyScreenStar")
-        emptyScreenImage.translatesAutoresizingMaskIntoConstraints = false
-        
-        
-        let emptyScreenText = UILabel()
-        emptyScreenText.translatesAutoresizingMaskIntoConstraints = false
-        emptyScreenText.text = "Что будем отслеживать?"
-        emptyScreenText.font = UIFont.systemFont(ofSize: 12, weight: .medium)
-        
         view.addSubview(emptyScreenImage)
         view.addSubview(emptyScreenText)
         
@@ -71,7 +79,6 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
         datePicker.preferredDatePickerStyle = .compact
         datePicker.datePickerMode = .date
         datePicker.addTarget(self, action: #selector(setDateForTrackers), for: .valueChanged)
-        datePicker.maximumDate = Date()
         let dateButton = UIBarButtonItem(customView: datePicker)
         
         return dateButton
@@ -128,6 +135,9 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
     }
     
     func setupEmptyScreen() {
+        let isSearch = presenter?.search.isEmpty ?? true
+        emptyScreenImage.image = isSearch ? UIImage(named: "EmptyScreenStar") : UIImage(named: "EmptyScreenSmileThinking")
+        emptyScreenText.text = isSearch ? "Что будем отслеживать?" : "Ничего не найдено"
         emptyScreenView.isHidden = presenter?.categories.count ?? 0 > 0
         trackersCollectionView.isHidden = presenter?.categories.count == 0
     }
@@ -184,6 +194,7 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
     
     func didComplete(_ complete: Bool, tracker: Tracker) {
         presenter?.completeTracker(complete, tracker: tracker)
+        comletedTracker = !comletedTracker
     }
 }
 

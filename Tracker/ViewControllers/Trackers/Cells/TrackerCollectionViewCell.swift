@@ -174,6 +174,6 @@ class TrackerCollectionViewCell: UICollectionViewCell {
         daysCounter = viewModel.daysCounter
         tracker = viewModel.tracker
         comletedTracker = viewModel.isCompleted
-        
+        counterButton.isEnabled = viewModel.isComplitionEnable
     }
 }

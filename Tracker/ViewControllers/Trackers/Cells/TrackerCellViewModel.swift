@@ -11,4 +11,5 @@ struct TrackerCellViewModel {
     let tracker: Tracker
     let isCompleted: Bool
     let daysCounter: Int
+    let isComplitionEnable: Bool
 }

@@ -251,9 +251,9 @@ extension NewHabitViewController: UITableViewDataSource {
         case .textField:
             return textFieldCell(at: indexPath, placeholder: "Введите название трекера")
         case .category:
-            return planningCell(at: indexPath, title: "Категория", subtitle: presenter?.selectedCategory?.name)
+            return planningCell(at: indexPath, title: "Категория", subtitle: presenter?.categoryName)
         case .schedule:
-            return planningCell(at: indexPath, title: "Расписание", subtitle: presenter?.schedule.map{ FormatterDays.shortWeekday(at: $0)}.joined(separator: ", "))
+            return planningCell(at: indexPath, title: "Расписание", subtitle: presenter?.sheduleString)
         case .emoji:
             return emojiCell(at: indexPath)
         case .color:
