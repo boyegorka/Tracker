@@ -8,7 +8,7 @@
 import Foundation
 
 protocol TimetablePresenterProtocol {
-    var view: TimetableViewControllerProtocol { get }
+    var view: TimetableViewControllerProtocol? { get }
     var selectedWeekdays: [Int] { get set }
     var weekdays: [String] { get }
     func done()
@@ -20,7 +20,7 @@ protocol TimetableDelegate {
 
 class TimetablePresenter: TimetablePresenterProtocol {
     
-    var view: TimetableViewControllerProtocol
+    weak var view: TimetableViewControllerProtocol?
     var delegate: TimetableDelegate
     var selectedWeekdays: [Int]
     let weekdays = FormatterDays.weekdays

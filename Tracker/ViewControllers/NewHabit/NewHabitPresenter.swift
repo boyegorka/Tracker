@@ -17,6 +17,8 @@ protocol NewHabitPresenterProtocol {
     var isValidForm: Bool { get }
     var sheduleString: String { get }
     var categoryName: String? { get }
+    var emoji: String? { get set }
+    var color: UIColor? { get set }
     func createNewTracker()
 }
 
@@ -30,12 +32,26 @@ final class NewHabitPresenter: NewHabitPresenterProtocol {
     var trackerName: String?
     var subtitleForCategory: String = ""
     var categories: [TrackerCategory]
-    var selectedCategory: TrackerCategory?
-    var view: NewHabitViewControllerProtocol?
+    var selectedCategory: TrackerCategory? {
+        didSet {
+            
+        }
+    }
+    var emoji: String? {
+        didSet {
+            print(emoji)
+        }
+    }
+    var color: UIColor? {
+        didSet {
+            print(color)
+        }
+    }
+    weak var view: NewHabitViewControllerProtocol?
     var type: TrackerType
     var schedule: [Int] = []
     var isValidForm: Bool {
-        selectedCategory != nil && trackerName != nil && !schedule.isEmpty
+        selectedCategory != nil && trackerName != nil && !schedule.isEmpty && emoji != nil && color != nil
     }
     var sheduleString: String {
         if schedule.count == FormatterDays.weekdays.count {
@@ -54,12 +70,13 @@ final class NewHabitPresenter: NewHabitPresenterProtocol {
         self.categories = categories
     }
     
-    
     func createNewTracker() {
         guard let name = trackerName,
-              let selectedCategory
+              let selectedCategory,
+              let emoji,
+              let color
         else { return }
-        let newTracker = Tracker(id: UUID(), name: name, color: .ypSelection2 ?? .black, emoji: "🌺", schedule: schedule)
+        let newTracker = Tracker(id: UUID(), name: name, color: color, emoji: emoji, schedule: schedule)
         delegate?.didCreateTracker(newTracker, at: selectedCategory)
     }
 }

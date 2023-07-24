@@ -7,7 +7,7 @@
 
 import UIKit
 
-protocol TrackerTypeViewControllerProtocol {
+protocol TrackerTypeViewControllerProtocol: AnyObject {
     var presenter: TrackerTypePresenterProtocol? { get }
 }
 

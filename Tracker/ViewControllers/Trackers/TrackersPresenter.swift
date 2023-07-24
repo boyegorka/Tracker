@@ -10,7 +10,8 @@ import UIKit
 protocol TrackersPresenterProtocol {
     var view: TrackersViewControllerProtocol? { get }
     var currentDate: Date { get set }
-    var categories: [TrackerCategory] { get }
+    var visibleCategories: [TrackerCategory] { get }
+    var caregories: [TrackerCategory] { get }
     var search: String { get set }
     func addTracker(_ tracker: Tracker, at category: TrackerCategory)
     func numberOfSections() -> Int?
@@ -22,7 +23,8 @@ protocol TrackersPresenterProtocol {
 
 final class TrackersPresenter: TrackersPresenterProtocol {
     
-    var categories: [TrackerCategory] = []
+    var visibleCategories: [TrackerCategory] = []
+    var caregories: [TrackerCategory] = []
     weak var view: TrackersViewControllerProtocol?
     private let service = TrackerService()
     
@@ -38,14 +40,14 @@ final class TrackersPresenter: TrackersPresenterProtocol {
     }
     
     
-    
     func addTracker(_ tracker: Tracker, at category: TrackerCategory) {
         service.addTracker(tracker, at: category)
         updateCategories()
     }
     
     func updateCategories() {
-        categories = service.getCategoriesFor(date: currentDate, search: search)
+        visibleCategories = service.getCategoriesFor(date: currentDate, search: search)
+        caregories = service.categories
     }
     
     func completeTracker(_ complete: Bool, tracker: Tracker) {
@@ -66,15 +68,15 @@ final class TrackersPresenter: TrackersPresenterProtocol {
     
     func numberOfSections() -> Int? {
         view?.setupEmptyScreen()
-        return categories.count
+        return visibleCategories.count
     }
     
     func numberOfItemsInSection(section: Int) -> Int {
-        categories[section].trackers.count
+        visibleCategories[section].trackers.count
     }
     
     func trackerViewModel(at indexPath: IndexPath) -> TrackerCellViewModel {
-        let tracker = categories[indexPath.section].trackers[indexPath.row]
+        let tracker = visibleCategories[indexPath.section].trackers[indexPath.row]
         return TrackerCellViewModel(tracker: tracker, isCompleted: isCompletedTracker(tracker), daysCounter: countRecordsTracker(tracker), isComplitionEnable: currentDate <= Date())
     }
 }

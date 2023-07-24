@@ -16,11 +16,11 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
     
     var comletedTracker: Bool = false
     
-    
     var presenter: TrackersPresenterProtocol?
     
     enum Contstants {
         static let cellIdentifier = "TrackerCell"
+        static let headerIdentifier = "TrackersHeader"
         static let contentInsets: CGFloat = 16
         static let spacing: CGFloat = 9
     }
@@ -33,10 +33,9 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
         collectionView.showsVerticalScrollIndicator = false
         collectionView.dataSource = self
         collectionView.delegate = self
-        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: Contstants.cellIdentifier)
-        collectionView.register(TrackerCollectionViewCell.self, forCellWithReuseIdentifier: Contstants.cellIdentifier)
         collectionView.contentInset = UIEdgeInsets(top: 24, left: Contstants.contentInsets, bottom: 24, right: Contstants.contentInsets)
-        collectionView.register(SupplementaryView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "header")
+        collectionView.register(TrackerCollectionViewCell.self, forCellWithReuseIdentifier: Contstants.cellIdentifier)
+        collectionView.register(SupplementaryView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: Contstants.headerIdentifier)
         return collectionView
     }()
     
@@ -138,8 +137,8 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
         let isSearch = presenter?.search.isEmpty ?? true
         emptyScreenImage.image = isSearch ? UIImage(named: "EmptyScreenStar") : UIImage(named: "EmptyScreenSmileThinking")
         emptyScreenText.text = isSearch ? "Что будем отслеживать?" : "Ничего не найдено"
-        emptyScreenView.isHidden = presenter?.categories.count ?? 0 > 0
-        trackersCollectionView.isHidden = presenter?.categories.count == 0
+        emptyScreenView.isHidden = presenter?.visibleCategories.count ?? 0 > 0
+        trackersCollectionView.isHidden = presenter?.visibleCategories.count == 0
     }
     
     // MARK: - Actions
@@ -169,7 +168,7 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
     
     func didSelectType(_ type: TrackerType) {
         let vc = NewHabitViewController()
-        let presenter = NewHabitPresenter(type: type, categories: presenter?.categories ?? [])
+        let presenter = NewHabitPresenter(type: type, categories: presenter?.caregories ?? [])
         
         vc.presenter = presenter
         presenter.view = vc
@@ -222,10 +221,9 @@ extension TrackersViewController: UICollectionViewDataSource {
 extension TrackersViewController: UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        let id = "header"
         
-        guard let view = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: id, for: indexPath) as? SupplementaryView else { return UICollectionReusableView() }
-        view.title.text = presenter?.categories[indexPath.section].name
+        guard let view = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: Contstants.headerIdentifier, for: indexPath) as? SupplementaryView else { return UICollectionReusableView() }
+        view.title.text = presenter?.visibleCategories[indexPath.section].name
         return view
     }
 }
