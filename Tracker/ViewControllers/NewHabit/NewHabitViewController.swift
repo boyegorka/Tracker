@@ -263,7 +263,7 @@ extension NewHabitViewController: UITableViewDataSource {
         case .textField:
             return textFieldCell(at: indexPath, placeholder: "Введите название трекера")
         case .category:
-            return planningCell(at: indexPath, title: "Категория", subtitle: presenter?.categoryName)
+            return planningCell(at: indexPath, title: "Категория", subtitle: presenter?.selectedCategory)
         case .schedule:
             return planningCell(at: indexPath, title: "Расписание", subtitle: presenter?.sheduleString)
         case .emoji:

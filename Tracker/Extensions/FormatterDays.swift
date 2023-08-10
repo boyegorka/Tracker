@@ -22,4 +22,13 @@ extension Date {
     var weekdayIndex: Int {
         Calendar.current.component(.weekday, from: self) - 1
     }
+    
+    var onlyDate: Date? {
+        get {
+            let calender = Calendar.current
+            var dateComponents = calender.dateComponents([.year, .month, .day], from: self)
+            dateComponents.timeZone = NSTimeZone.system
+            return calender.date(from: dateComponents)
+        }
+    }
 }

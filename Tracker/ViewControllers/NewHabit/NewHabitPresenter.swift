@@ -12,18 +12,17 @@ protocol NewHabitPresenterProtocol {
     var trackerName: String? { get set }
     var subtitleForCategory: String { get set }
     var type: TrackerType { get set }
-    var selectedCategory: TrackerCategory? { get }
+    var selectedCategory: String? { get }
     var schedule: [Int] { get set }
     var isValidForm: Bool { get }
     var sheduleString: String { get }
-    var categoryName: String? { get }
     var emoji: String? { get set }
     var color: UIColor? { get set }
     func createNewTracker()
 }
 
 protocol NewHabitDelegate {
-    func didCreateTracker(_ tracker: Tracker, at category: TrackerCategory)
+    func didCreateTracker(_ tracker: Tracker, at category: String)
 }
 
 final class NewHabitPresenter: NewHabitPresenterProtocol {
@@ -31,22 +30,10 @@ final class NewHabitPresenter: NewHabitPresenterProtocol {
     var delegate: NewHabitDelegate?
     var trackerName: String?
     var subtitleForCategory: String = ""
-    var categories: [TrackerCategory]
-    var selectedCategory: TrackerCategory? {
-        didSet {
-            
-        }
-    }
-    var emoji: String? {
-        didSet {
-            print(emoji)
-        }
-    }
-    var color: UIColor? {
-        didSet {
-            print(color)
-        }
-    }
+    var categories: [String]
+    var selectedCategory: String?
+    var emoji: String?
+    var color: UIColor?
     weak var view: NewHabitViewControllerProtocol?
     var type: TrackerType
     var schedule: [Int] = []
@@ -60,11 +47,8 @@ final class NewHabitPresenter: NewHabitPresenterProtocol {
             return schedule.map { FormatterDays.shortWeekday(at: $0)}.joined(separator: ", ")
         }
     }
-    var categoryName: String? {
-        selectedCategory?.name
-    }
     
-    init(type: TrackerType, categories: [TrackerCategory]) {
+    init(type: TrackerType, categories: [String]) {
         self.type = type
         self.selectedCategory = categories.first
         self.categories = categories

@@ -9,12 +9,11 @@ import UIKit
 
 protocol TrackersViewControllerProtocol: AnyObject {
     var presenter: TrackersPresenterProtocol? { get }
+    var trackersCollectionView: UICollectionView { get }
     func setupEmptyScreen()
 }
 
 final class TrackersViewController: UIViewController, TrackersViewControllerProtocol, TrackerTypeDelegate, NewHabitDelegate, TrackerCollectionViewCellDelegate {
-    
-    var comletedTracker: Bool = false
     
     var presenter: TrackersPresenterProtocol?
     
@@ -25,7 +24,7 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
         static let spacing: CGFloat = 9
     }
     
-    private lazy var trackersCollectionView: UICollectionView = {
+    lazy var trackersCollectionView: UICollectionView = {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
         
         collectionView.translatesAutoresizingMaskIntoConstraints = false
@@ -135,10 +134,11 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
     
     func setupEmptyScreen() {
         let isSearch = presenter?.search.isEmpty ?? true
+        let isEmpty = presenter?.isEmpty ?? true
         emptyScreenImage.image = isSearch ? UIImage(named: "EmptyScreenStar") : UIImage(named: "EmptyScreenSmileThinking")
         emptyScreenText.text = isSearch ? "Что будем отслеживать?" : "Ничего не найдено"
-        emptyScreenView.isHidden = presenter?.visibleCategories.count ?? 0 > 0
-        trackersCollectionView.isHidden = presenter?.visibleCategories.count == 0
+        emptyScreenView.isHidden = !isEmpty
+        trackersCollectionView.isHidden = isEmpty
     }
     
     // MARK: - Actions
@@ -184,7 +184,7 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
     
     // MARK: - NewHabitDelegate
     
-    func didCreateTracker(_ tracker: Tracker, at category: TrackerCategory) {
+    func didCreateTracker(_ tracker: Tracker, at category: String) {
         presenter?.addTracker(tracker, at: category)
         trackersCollectionView.reloadData()
     }
@@ -193,7 +193,6 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
     
     func didComplete(_ complete: Bool, tracker: Tracker) {
         presenter?.completeTracker(complete, tracker: tracker)
-        comletedTracker = !comletedTracker
     }
 }
 
@@ -223,7 +222,7 @@ extension TrackersViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         
         guard let view = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: Contstants.headerIdentifier, for: indexPath) as? SupplementaryView else { return UICollectionReusableView() }
-        view.title.text = presenter?.visibleCategories[indexPath.section].name
+        view.title.text = presenter?.titleInSection(section: indexPath.section)
         return view
     }
 }
