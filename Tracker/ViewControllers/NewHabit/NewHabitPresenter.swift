@@ -27,14 +27,13 @@ protocol NewHabitDelegate {
 
 final class NewHabitPresenter: NewHabitPresenterProtocol {
     
+    // MARK: - Public Properties
     var delegate: NewHabitDelegate?
     var trackerName: String?
     var subtitleForCategory: String = ""
-    var categories: [String]
     var selectedCategory: String?
     var emoji: String?
     var color: UIColor?
-    weak var view: NewHabitViewControllerProtocol?
     var type: TrackerType
     var schedule: [Int] = []
     var isValidForm: Bool {
@@ -47,13 +46,19 @@ final class NewHabitPresenter: NewHabitPresenterProtocol {
             return schedule.map { FormatterDays.shortWeekday(at: $0)}.joined(separator: ", ")
         }
     }
+    weak var view: NewHabitViewControllerProtocol?
     
+    // MARK: - Private Properties
+    private var categories: [String]
+    
+    // MARK: - Initializers
     init(type: TrackerType, categories: [String]) {
         self.type = type
         self.selectedCategory = categories.first
         self.categories = categories
     }
     
+    // MARK: - Public Methods
     func createNewTracker() {
         guard let name = trackerName,
               let selectedCategory,

@@ -9,6 +9,7 @@ import UIKit
 
 class ResizableCollectionView: UICollectionView {
     
+    // MARK: - Public Properties
     override var contentSize: CGSize {
         didSet {
             invalidateIntrinsicContentSize()

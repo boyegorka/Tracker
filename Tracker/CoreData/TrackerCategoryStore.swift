@@ -15,13 +15,16 @@ enum TrackerCategoryStoreError: Error {
 
 class TrackerCategoryStore: NSObject {
     
+    // MARK: - Private Properties
     private let context: NSManagedObjectContext
     
+    // MARK: - Initializers
     init(context: NSManagedObjectContext) {
         self.context = context
         super.init()
     }
     
+    // MARK: - Public Methods
     func getCategoryNames() -> [String] {
         let request = NSFetchRequest<TrackerCategoryCoreData>(entityName: "TrackerCategoryCoreData")
         request.propertiesToFetch = ["name"]

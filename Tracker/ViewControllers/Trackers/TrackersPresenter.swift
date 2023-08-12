@@ -24,14 +24,7 @@ protocol TrackersPresenterProtocol {
 
 final class TrackersPresenter: TrackersPresenterProtocol {
     
-    weak var view: TrackersViewControllerProtocol?
-    // сделать работу сервиса через протокол делегата
-    private let service = TrackerService()
-    
-    init() {
-        service.delegate = self
-    }
-    
+    // MARK: - Public Properties
     var search: String = "" {
         didSet {
             updateCategories()
@@ -51,7 +44,17 @@ final class TrackersPresenter: TrackersPresenterProtocol {
         service.numberOfSections == 0
     }
     
+    weak var view: TrackersViewControllerProtocol?
     
+    // MARK: - Private Properties
+    private let service = TrackerService()
+    
+    // MARK: - Initializers
+    init() {
+        service.delegate = self
+    }
+    
+    // MARK: - Public Methods
     func addTracker(_ tracker: Tracker, at category: String) {
         do {
             try service.addTracker(tracker, at: category)
@@ -111,6 +114,7 @@ final class TrackersPresenter: TrackersPresenterProtocol {
     }
 }
 
+// MARK: - TrackerServiceDelegate
 extension TrackersPresenter: TrackerServiceDelegate {
     
     func didUpdate(_ update: TrackerServiceUpdate) {

@@ -11,8 +11,9 @@ protocol NewHabitViewControllerProtocol: AnyObject {
     var presenter: NewHabitPresenterProtocol? { get }
 }
 
-class NewHabitViewController: UIViewController, NewHabitViewControllerProtocol, TextFieldCellDelegate, TimetableDelegate, CollectionCellDelegate {
+final class NewHabitViewController: UIViewController, NewHabitViewControllerProtocol {
     
+    // MARK: - Enums
     enum Constant {
         static let textFieldCellIdentifier = "TextFieldCell"
         static let planningCellIdentifier = "PlaningCell"
@@ -35,10 +36,12 @@ class NewHabitViewController: UIViewController, NewHabitViewControllerProtocol, 
         }
     }
     
+    // MARK: - Public Properties
     var presenter: NewHabitPresenterProtocol?
     
+    // MARK: - Private Properties
     private let emojis: [String] = ["🙂", "😻", "🌺", "🐶", "❤️", "😱", "😇", "😡", "🥶", "🤔", "🙌", "🍔", "🥦", "🏓", "🥇", "🎸", "🏝️", "😪"]
-    private let colors: [UIColor] = [.ypSelection1, .ypSelection2, .ypSelection3, .ypSelection4, .ypSelection5, .ypSelection6, .ypSelection7, .ypSelection8, .ypSelection9, .ypSelection10, .ypSelection11, .ypSelection12, .ypSelection13, .ypSelection14, .ypSelection15, .ypSelection16, .ypSelection17, .ypSelection18]
+    private let colors: [UIColor?] = [.ypSelection1, .ypSelection2, .ypSelection3, .ypSelection4, .ypSelection5, .ypSelection6, .ypSelection7, .ypSelection8, .ypSelection9, .ypSelection10, .ypSelection11, .ypSelection12, .ypSelection13, .ypSelection14, .ypSelection15, .ypSelection16, .ypSelection17, .ypSelection18]
     
     private lazy var tableView: UITableView = {
         let planningTableView = UITableView(frame: .zero, style: .insetGrouped)
@@ -58,7 +61,7 @@ class NewHabitViewController: UIViewController, NewHabitViewControllerProtocol, 
         let cancelButton = UIButton()
         cancelButton.layer.cornerRadius = 16
         cancelButton.layer.borderWidth = 1
-        cancelButton.layer.borderColor = UIColor.ypRed.cgColor
+        cancelButton.layer.borderColor = UIColor.ypRed?.cgColor
         cancelButton.backgroundColor = .ypWhite
         cancelButton.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         cancelButton.setTitleColor(.ypRed, for: .normal)
@@ -87,12 +90,14 @@ class NewHabitViewController: UIViewController, NewHabitViewControllerProtocol, 
         return buttonsStackView
     }()
     
+    // MARK: - View Life Cycles
     override func viewDidLoad() {
         super.viewDidLoad()
         setupNewHabitScreen()
         tableView.reloadData()
     }
     
+    // MARK: - Private Methods
     private func setupNewHabitScreen() {
         self.hideKeyboardOnTap()
         view.backgroundColor = .ypWhite
@@ -137,9 +142,9 @@ class NewHabitViewController: UIViewController, NewHabitViewControllerProtocol, 
             return [.textField]
         case .planning:
             switch presenter?.type {
-            case .Habit:
+            case .habit:
                 return [.category, .schedule]
-            case .UnregularEvent:
+            case .unregularEvent:
                 return [.category]
             case .none:
                 return []
@@ -149,17 +154,6 @@ class NewHabitViewController: UIViewController, NewHabitViewControllerProtocol, 
         case .color:
             return [.color]
         }
-    }
-    
-    @objc
-    private func cancelHabitCreation() {
-        dismiss(animated: true)
-    }
-    
-    @objc
-    private func createHabit() {
-        presenter?.createNewTracker()
-        dismiss(animated: true)
     }
     
     private func textFieldCell(at indexPath: IndexPath, placeholder: String) -> UITableViewCell {
@@ -214,7 +208,20 @@ class NewHabitViewController: UIViewController, NewHabitViewControllerProtocol, 
         createButton.backgroundColor = createButton.isEnabled ? .ypBlack : .ypGray
     }
     
-    // MARK: - TimetableDelegate
+    @objc
+    private func cancelHabitCreation() {
+        dismiss(animated: true)
+    }
+    
+    @objc
+    private func createHabit() {
+        presenter?.createNewTracker()
+        dismiss(animated: true)
+    }
+}
+
+// MARK: - TimetableDelegate
+extension NewHabitViewController: TimetableDelegate {
     
     func didSelect(weekdays: [Int]) {
         presenter?.schedule = weekdays
@@ -224,15 +231,19 @@ class NewHabitViewController: UIViewController, NewHabitViewControllerProtocol, 
             tableView.reloadRows(at: [IndexPath(row: row, section: section.rawValue)], with: .none)
         }
     }
-    
-    // MARK: - TextFieldCellDelegate
+}
+
+// MARK: - TextFieldCellDelegate
+extension NewHabitViewController: TextFieldCellDelegate {
     
     func didTextChange(text: String?) {
         presenter?.trackerName = text
         updateButtonState()
     }
-    
-    // MARK: - CollectionCellDelegate
+}
+
+// MARK: - CollectionCellDelegate
+extension NewHabitViewController: CollectionCellDelegate {
     
     func didEmojiSet(emoji: String?) {
         presenter?.emoji = emoji
@@ -245,6 +256,7 @@ class NewHabitViewController: UIViewController, NewHabitViewControllerProtocol, 
     }
 }
 
+// MARK: - UITableViewDataSource
 extension NewHabitViewController: UITableViewDataSource {
     
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -274,11 +286,13 @@ extension NewHabitViewController: UITableViewDataSource {
     }
 }
 
+// MARK: - UITableViewDelegate
 extension NewHabitViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard let section = Section(rawValue: indexPath.section) else { return }
         switch rowsForSection(section)[indexPath.row] {
+            
         case .category:
             showCategory()
         case .schedule:
@@ -290,7 +304,6 @@ extension NewHabitViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        
         guard let section = Section(rawValue: indexPath.section) else { return 0 }
         switch rowsForSection(section)[indexPath.row] {
             

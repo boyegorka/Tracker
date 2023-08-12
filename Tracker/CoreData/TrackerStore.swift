@@ -14,15 +14,18 @@ enum TrackerStoreError: Error {
 
 class TrackerStore: NSObject {
     
+    // MARK: - Private Properties
     private let colorMarshalling = СolorMarshalling()
     private let scheduleConverter = ScheduleConverter()
     private let context: NSManagedObjectContext
     
+    // MARK: - Initializers
     init(context: NSManagedObjectContext) {
         self.context = context
         super.init()
     }
     
+    // MARK: - Public Methods
     func getTrackerFromCoreData(from trackerCoreData: TrackerCoreData) -> Tracker {
         return Tracker(id: trackerCoreData.trackerId,
                        name: trackerCoreData.name,
@@ -39,6 +42,7 @@ class TrackerStore: NSObject {
         try context.save()
     }
     
+    // MARK: - Private Methods
     private func updateTrackers(_ trackerCoreData: TrackerCoreData, _ tracker: Tracker) {
         trackerCoreData.trackerId = tracker.id
         trackerCoreData.name = tracker.name

@@ -12,11 +12,12 @@ protocol CollectionCellDelegate {
     func didColorSet(color: UIColor?)
 }
 
-class CollectionCell: UITableViewCell {
+final class CollectionCell: UITableViewCell {
     
+    // MARK: - Enums
     enum CollectionCellType {
         case emoji(items: [String])
-        case color(items: [UIColor])
+        case color(items: [UIColor?])
     }
     
     enum Contstants {
@@ -30,6 +31,7 @@ class CollectionCell: UITableViewCell {
         static let topInsetsSection: CGFloat = 16
     }
     
+    // MARK: - Public Properties
     var delegate: CollectionCellDelegate?
     
     var type: CollectionCellType = .emoji(items: []) {
@@ -39,16 +41,12 @@ class CollectionCell: UITableViewCell {
         }
     }
     
+    // MARK: - Private Properties
     private var cellHeight: NSLayoutConstraint?
     
     private var cellSize: CGFloat {
         let size = ((UIScreen.main.bounds.width - Contstants.contentInsets * 2) / CGFloat(Contstants.cellCountInline)).rounded(.down)
         return size - CGFloat(Contstants.cellCountInline)
-    }
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        updateSize()
     }
     
     private lazy var emojisCollectionView: ResizableCollectionView = {
@@ -67,6 +65,7 @@ class CollectionCell: UITableViewCell {
         return collectionView
     }()
 
+    // MARK: - Initializers
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupSubviews()
@@ -77,6 +76,13 @@ class CollectionCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - View Life Cycles
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        updateSize()
+    }
+    
+    // MARK: - Private Methods
     private func updateSize() {
         emojisCollectionView.layoutIfNeeded()
     }
@@ -102,6 +108,7 @@ class CollectionCell: UITableViewCell {
     }
 }
 
+// MARK: - UICollectionViewDataSource
 extension CollectionCell: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -129,6 +136,7 @@ extension CollectionCell: UICollectionViewDataSource {
     }
 }
 
+// MARK: - UICollectionViewDelegate
 extension CollectionCell: UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
@@ -158,8 +166,7 @@ extension CollectionCell: UICollectionViewDelegate {
     }
 }
 
-
-
+// MARK: - UICollectionViewDelegateFlowLayout
 extension CollectionCell: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {

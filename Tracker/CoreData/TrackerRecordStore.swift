@@ -16,15 +16,18 @@ enum TrackerRecordStoreError: Error {
 
 class TrackerRecordStore: NSObject {
     
+    // MARK: - Private Properties
     private let context: NSManagedObjectContext
     private let colorMarshalling = СolorMarshalling()
     private let scheduleConverter = ScheduleConverter()
     
+    // MARK: - Initializers
     init(context: NSManagedObjectContext) {
         self.context = context
         super.init()
     }
     
+    // MARK: - Public Methods
     func getTrackerRecordFromCoreData(tracker: Tracker, date: Date) -> TrackerRecord? {
         var trackerToReturn: TrackerRecord? = nil
         guard let date = date.onlyDate else { return nil }

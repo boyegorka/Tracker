@@ -9,6 +9,7 @@ import Foundation
 
 class ScheduleConverter {
     
+    // MARK: - Public Methods
     func convertToString(array: [Int]) -> String {
         array.map { String($0) }.joined()
     }

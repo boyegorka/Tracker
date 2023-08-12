@@ -7,14 +7,16 @@
 
 import UIKit
 
-class EmojisCollectionViewCell: UICollectionViewCell {
+final class EmojisCollectionViewCell: UICollectionViewCell {
     
+    // MARK: - Public Properties
     var emoji: String? {
         didSet {
             emojiLabel.text = emoji
         }
     }
     
+    // MARK: - Private Properties
     private var emojiLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 32, weight: .bold)
@@ -30,6 +32,7 @@ class EmojisCollectionViewCell: UICollectionViewCell {
         return view
     }()
     
+    // MARK: - Initializers
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupSubviews()
@@ -39,6 +42,7 @@ class EmojisCollectionViewCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - Private Methods
     private func setupSubviews() {
         addSubviews()
         constraintSubviews()

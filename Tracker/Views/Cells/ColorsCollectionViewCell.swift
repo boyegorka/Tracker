@@ -7,16 +7,18 @@
 
 import UIKit
 
-class ColorsCollectionViewCell: UICollectionViewCell {
+final class ColorsCollectionViewCell: UICollectionViewCell {
     
-    private let alphaOfColor: CGFloat = 0.3
-    
+    // MARK: - Public Properties
     var color: UIColor? {
         didSet {
             colorView.backgroundColor = color
             colorBackground.layer.borderColor = color?.withAlphaComponent(alphaOfColor).cgColor
         }
     }
+    
+    // MARK: - Private Properties
+    private let alphaOfColor: CGFloat = 0.3
     
     private var colorView: UIView = {
         let view = UIView()
@@ -34,6 +36,7 @@ class ColorsCollectionViewCell: UICollectionViewCell {
         return view
     }()
     
+    // MARK: - Initializers
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupSubviews()
@@ -43,6 +46,7 @@ class ColorsCollectionViewCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - Private Methods
     private func setupSubviews() {
         addSubviews()
         constraintSubviews()

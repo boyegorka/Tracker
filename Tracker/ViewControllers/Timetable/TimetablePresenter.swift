@@ -18,19 +18,22 @@ protocol TimetableDelegate {
     func didSelect(weekdays: [Int])
 }
 
-class TimetablePresenter: TimetablePresenterProtocol {
+final class TimetablePresenter: TimetablePresenterProtocol {
     
+    // MARK: - Public Properties
     weak var view: TimetableViewControllerProtocol?
     var delegate: TimetableDelegate
     var selectedWeekdays: [Int]
     let weekdays = FormatterDays.weekdays
     
+    // MARK: - Initializers
     init(view: TimetableViewControllerProtocol, selected: [Int], delegate: TimetableDelegate) {
         self.view = view
         self.delegate = delegate
         self.selectedWeekdays = selected
     }
     
+    // MARK: - Public Methods
     func done() {
         delegate.didSelect(weekdays: selectedWeekdays)
         print(selectedWeekdays)

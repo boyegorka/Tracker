@@ -9,8 +9,10 @@ import UIKit
 
 class SupplementaryView: UICollectionReusableView {
     
+    // MARK: - Public Properties
     let title = UILabel()
     
+    // MARK: - Initializers
     override init(frame: CGRect) {
         super.init(frame: frame)
         

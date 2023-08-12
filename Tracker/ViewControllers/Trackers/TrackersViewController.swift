@@ -13,9 +13,7 @@ protocol TrackersViewControllerProtocol: AnyObject {
     func setupEmptyScreen()
 }
 
-final class TrackersViewController: UIViewController, TrackersViewControllerProtocol, TrackerTypeDelegate, NewHabitDelegate, TrackerCollectionViewCellDelegate {
-    
-    var presenter: TrackersPresenterProtocol?
+final class TrackersViewController: UIViewController, TrackersViewControllerProtocol {
     
     enum Contstants {
         static let cellIdentifier = "TrackerCell"
@@ -23,6 +21,9 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
         static let contentInsets: CGFloat = 16
         static let spacing: CGFloat = 9
     }
+    
+    // MARK: - Public Properties
+    var presenter: TrackersPresenterProtocol?
     
     lazy var trackersCollectionView: UICollectionView = {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
@@ -38,6 +39,7 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
         return collectionView
     }()
     
+    // MARK: - Private Properties
     private lazy var emptyScreenImage: UIImageView = {
         let imageView = UIImageView()
         imageView.image = UIImage(named: "EmptyScreenStar")
@@ -82,10 +84,40 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
         return dateButton
     }()
     
+    // MARK: - View Life Cycles
     override func viewDidLoad() {
         super.viewDidLoad()
         presenter?.updateCategories()
         setupTrackersScreen()
+    }
+    
+    // MARK: - Public Methods
+    func setupEmptyScreen() {
+        let isSearch = presenter?.search.isEmpty ?? true
+        let isEmpty = presenter?.isEmpty ?? true
+        emptyScreenImage.image = isSearch ? UIImage(named: "EmptyScreenStar") : UIImage(named: "EmptyScreenSmileThinking")
+        emptyScreenText.text = isSearch ? "Что будем отслеживать?" : "Ничего не найдено"
+        emptyScreenView.isHidden = !isEmpty
+        trackersCollectionView.isHidden = isEmpty
+    }
+    
+    // MARK: - Private Methods
+    private func setupNavigationBar() {
+        guard let navigationBar = navigationController?.navigationBar else { return }
+        
+        let leftButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(pushTrackerTypeViewController))
+        leftButton.tintColor = .ypBlack
+        navigationBar.topItem?.setLeftBarButton(leftButton, animated: true)
+        
+        navigationBar.topItem?.title = "Трекеры"
+        navigationBar.prefersLargeTitles = true
+        navigationBar.topItem?.largeTitleDisplayMode = .always
+        
+        let searchController = UISearchController(searchResultsController: nil)
+        searchController.searchBar.delegate = self
+        navigationBar.topItem?.searchController = searchController
+        
+        navigationBar.topItem?.setRightBarButton(datePickerButton, animated: true)
     }
     
     private func setupTrackersScreen() {
@@ -113,36 +145,7 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
             emptyScreenView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
         ])
     }
-    
-    private func setupNavigationBar() {
-        guard let navigationBar = navigationController?.navigationBar else { return }
-        
-        let leftButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(pushTrackerTypeViewController))
-        leftButton.tintColor = .ypBlack
-        navigationBar.topItem?.setLeftBarButton(leftButton, animated: true)
-        
-        navigationBar.topItem?.title = "Трекеры"
-        navigationBar.prefersLargeTitles = true
-        navigationBar.topItem?.largeTitleDisplayMode = .always
-        
-        let searchController = UISearchController(searchResultsController: nil)
-        searchController.searchBar.delegate = self
-        navigationBar.topItem?.searchController = searchController
-        
-        navigationBar.topItem?.setRightBarButton(datePickerButton, animated: true)
-    }
-    
-    func setupEmptyScreen() {
-        let isSearch = presenter?.search.isEmpty ?? true
-        let isEmpty = presenter?.isEmpty ?? true
-        emptyScreenImage.image = isSearch ? UIImage(named: "EmptyScreenStar") : UIImage(named: "EmptyScreenSmileThinking")
-        emptyScreenText.text = isSearch ? "Что будем отслеживать?" : "Ничего не найдено"
-        emptyScreenView.isHidden = !isEmpty
-        trackersCollectionView.isHidden = isEmpty
-    }
-    
-    // MARK: - Actions
-    
+
     @objc
     private func pushTrackerTypeViewController() {
         let vc = TrackerTypeViewController()
@@ -163,8 +166,10 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
         presenter?.currentDate = sender.date
         trackersCollectionView.reloadData()
     }
-    
-    // MARK: - TrackerTypeDelegate
+}
+
+// MARK: - TrackerTypeDelegate
+extension TrackersViewController: TrackerTypeDelegate {
     
     func didSelectType(_ type: TrackerType) {
         let vc = NewHabitViewController()
@@ -181,21 +186,26 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
         let navigationController = UINavigationController(rootViewController: vc)
         self.present(navigationController, animated: true)
     }
-    
-    // MARK: - NewHabitDelegate
+}
+
+// MARK: - NewHabitDelegate
+extension TrackersViewController: NewHabitDelegate {
     
     func didCreateTracker(_ tracker: Tracker, at category: String) {
         presenter?.addTracker(tracker, at: category)
         trackersCollectionView.reloadData()
     }
-    
-    // MARK: - TrackerCollectionViewCellDelegate
+}
+
+// MARK: - TrackerCollectionViewCellDelegate
+extension TrackersViewController: TrackerCollectionViewCellDelegate {
     
     func didComplete(_ complete: Bool, tracker: Tracker) {
         presenter?.completeTracker(complete, tracker: tracker)
     }
 }
 
+// MARK: - UICollectionViewDataSource
 extension TrackersViewController: UICollectionViewDataSource {
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
@@ -217,6 +227,7 @@ extension TrackersViewController: UICollectionViewDataSource {
     }
 }
 
+// MARK: - UICollectionViewDelegate
 extension TrackersViewController: UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
@@ -227,6 +238,7 @@ extension TrackersViewController: UICollectionViewDelegate {
     }
 }
 
+// MARK: - UICollectionViewDelegateFlowLayout
 extension TrackersViewController: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -249,6 +261,7 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
     }
 }
 
+// MARK: - UISearchBarDelegate
 extension TrackersViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         presenter?.search = searchText
