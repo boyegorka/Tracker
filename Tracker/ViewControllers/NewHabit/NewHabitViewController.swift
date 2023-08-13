@@ -61,7 +61,7 @@ final class NewHabitViewController: UIViewController, NewHabitViewControllerProt
         let cancelButton = UIButton()
         cancelButton.layer.cornerRadius = 16
         cancelButton.layer.borderWidth = 1
-        cancelButton.layer.borderColor = UIColor.ypRed?.cgColor
+        cancelButton.layer.borderColor = UIColor.ypRed.cgColor
         cancelButton.backgroundColor = .ypWhite
         cancelButton.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         cancelButton.setTitleColor(.ypRed, for: .normal)

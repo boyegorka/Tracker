@@ -127,9 +127,9 @@ final class TrackerService: NSObject {
             do {
                 try trackerCategoryStore?.addCategory(name: "test")
                 try trackerCategoryStore?.addCategory(name: "test2")
-                let tracker1 = Tracker(id: UUID(), name: "Поливать растения", color: .ypSelection18 ?? .gray, emoji: "❤️", schedule: [2])
+                let tracker1 = Tracker(id: UUID(), name: "Поливать растения", color: .ypSelection18, emoji: "❤️", schedule: [2])
                 try addTracker(tracker1, at: "test")
-                let tracker2 = Tracker(id: UUID(), name: "Поливать растения2", color: .ypSelection18 ?? .gray, emoji: "❤️", schedule: [0,1,2,3,4,5,6])
+                let tracker2 = Tracker(id: UUID(), name: "Поливать растения2", color: .ypSelection18, emoji: "❤️", schedule: [0,1,2,3,4,5,6])
                 try addTracker(tracker2, at: "test2")
             } catch {
                 
