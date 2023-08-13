@@ -9,13 +9,15 @@ import UIKit
 
 class SupplementaryView: UICollectionReusableView {
     
+    // MARK: - Public Properties
     let title = UILabel()
     
+    // MARK: - Initializers
     override init(frame: CGRect) {
         super.init(frame: frame)
         
         addSubview(title)
-        title.font = .systemFont(ofSize: 18, weight: .bold)
+        title.font = .systemFont(ofSize: 19, weight: .bold)
         title.textColor = .ypBlack
         title.translatesAutoresizingMaskIntoConstraints = false
         

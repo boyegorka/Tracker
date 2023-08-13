@@ -8,31 +8,34 @@
 import Foundation
 
 protocol TimetablePresenterProtocol {
-    var view: TimetableViewControllerProtocol { get }
+    var view: TimetableViewControllerProtocol? { get }
     var selectedWeekdays: [Int] { get set }
     var weekdays: [String] { get }
     func done()
 }
 
-protocol TimetableDelegate {
+protocol TimetableDelegate: AnyObject {
     func didSelect(weekdays: [Int])
 }
 
-class TimetablePresenter: TimetablePresenterProtocol {
+final class TimetablePresenter: TimetablePresenterProtocol {
     
-    var view: TimetableViewControllerProtocol
-    var delegate: TimetableDelegate
+    // MARK: - Public Properties
+    weak var view: TimetableViewControllerProtocol?
+    weak var delegate: TimetableDelegate?
     var selectedWeekdays: [Int]
     let weekdays = FormatterDays.weekdays
     
+    // MARK: - Initializers
     init(view: TimetableViewControllerProtocol, selected: [Int], delegate: TimetableDelegate) {
         self.view = view
         self.delegate = delegate
         self.selectedWeekdays = selected
     }
     
+    // MARK: - Public Methods
     func done() {
-        delegate.didSelect(weekdays: selectedWeekdays)
+        delegate?.didSelect(weekdays: selectedWeekdays)
         print(selectedWeekdays)
     }
 }

@@ -8,18 +8,21 @@
 import Foundation
 
 protocol TrackerTypePresenterProtocol {
-    var view: TrackerTypeViewControllerProtocol? { get }
+    var view: TrackerTypeViewControllerProtocol? { get set }
     func selectType(_ type: TrackerType)
 }
 
-protocol TrackerTypeDelegate {
+protocol TrackerTypeDelegate: AnyObject {
     func didSelectType(_ type: TrackerType)
 }
 
-class TrackerTypePresenter: TrackerTypePresenterProtocol {
+final class TrackerTypePresenter: TrackerTypePresenterProtocol {
     
-    var view: TrackerTypeViewControllerProtocol?
-    var delegate: TrackerTypeDelegate?
+    // MARK: - Public Properties
+    weak var delegate: TrackerTypeDelegate?
+    weak var view: TrackerTypeViewControllerProtocol?
+    
+    // MARK: - Public Methods
     func selectType(_ type: TrackerType) {
         delegate?.didSelectType(type)
     }

@@ -11,9 +11,10 @@ protocol TrackerCollectionViewCellDelegate: AnyObject {
     func didComplete(_ complete: Bool,  tracker: Tracker)
 }
 
-class TrackerCollectionViewCell: UICollectionViewCell {
+final class TrackerCollectionViewCell: UICollectionViewCell {
     
-    var delegate: TrackerCollectionViewCellDelegate?
+    // MARK: - Public Properties
+    weak var delegate: TrackerCollectionViewCellDelegate?
     
     var viewModel: TrackerCellViewModel? {
         didSet {
@@ -22,6 +23,7 @@ class TrackerCollectionViewCell: UICollectionViewCell {
         }
     }
     
+    // MARK: - Private Properties
     private var daysCounter: Int = 0 {
         didSet {
             updateCounterLabel()
@@ -90,6 +92,7 @@ class TrackerCollectionViewCell: UICollectionViewCell {
         return counterButton
     }()
     
+    // MARK: - Initializers
     override init(frame: CGRect) {
         super.init(frame: frame)
         addSubviews()
@@ -101,6 +104,7 @@ class TrackerCollectionViewCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - Private Methods
     private func addSubviews() {
         contentView.addSubview(rectangleView)
         rectangleView.addSubview(name)
@@ -140,18 +144,6 @@ class TrackerCollectionViewCell: UICollectionViewCell {
         ])
     }
     
-    @objc
-    private func checkForToday() {
-        if comletedTracker {
-            daysCounter -= 1
-        } else {
-            daysCounter += 1
-        }
-        comletedTracker = !comletedTracker
-        guard let tracker else { return }
-        delegate?.didComplete(comletedTracker, tracker: tracker)
-    }
-    
     private func upadateButtonState() {
         switch comletedTracker {
         case true:
@@ -175,5 +167,17 @@ class TrackerCollectionViewCell: UICollectionViewCell {
         tracker = viewModel.tracker
         comletedTracker = viewModel.isCompleted
         counterButton.isEnabled = viewModel.isComplitionEnable
+    }
+    
+    @objc
+    private func checkForToday() {
+        if comletedTracker {
+            daysCounter -= 1
+        } else {
+            daysCounter += 1
+        }
+        comletedTracker = !comletedTracker
+        guard let tracker else { return }
+        delegate?.didComplete(comletedTracker, tracker: tracker)
     }
 }

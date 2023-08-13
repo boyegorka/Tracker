@@ -9,6 +9,7 @@ import UIKit
 
 class StatisticsViewController: UIViewController {
     
+    // MARK: - Private Properties
     private lazy var emptyScreenImage: UIImageView = {
         let emptyScreenImage = UIImageView()
         view.addSubview(emptyScreenImage)
@@ -32,11 +33,13 @@ class StatisticsViewController: UIViewController {
         return emptyScreenText
     }()
     
+    // MARK: - View Life Cycles
     override func viewDidLoad() {
         super.viewDidLoad()
         setupStatisticsScreen()
     }
     
+    // MARK: - Private Methods
     private func setupStatisticsScreen() {
         emptyScreenImage.image = UIImage(named: "EmptyScreenSmileCrying")
         emptyScreenText.text = "Анализировать пока нечего"

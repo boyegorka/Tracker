@@ -8,6 +8,6 @@
 import Foundation
 
 enum TrackerType {
-    case Habit
-    case UnregularEvent
+    case habit
+    case unregularEvent
 }

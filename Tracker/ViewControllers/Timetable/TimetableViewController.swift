@@ -11,14 +11,17 @@ protocol TimetableViewControllerProtocol: AnyObject {
     var presenter: TimetablePresenterProtocol? { get }
 }
 
-class TimetableViewController: UIViewController, TimetableViewControllerProtocol {
+final class TimetableViewController: UIViewController, TimetableViewControllerProtocol {
     
-    var presenter: TimetablePresenterProtocol?
-    
+    // MARK: - Enums
     enum Contstant {
         static let timetableCellIdentifier = "TimetableCell"
     }
     
+    // MARK: - Public Properties
+    var presenter: TimetablePresenterProtocol?
+    
+    // MARK: - Private Properties
     private lazy var tableView: UITableView = {
         var timetable = UITableView(frame: .zero, style: .insetGrouped)
         timetable.separatorStyle = .singleLine
@@ -53,12 +56,13 @@ class TimetableViewController: UIViewController, TimetableViewControllerProtocol
         return readyButton
     }()
     
+    // MARK: - View Life Cycles
     override func viewDidLoad() {
         super.viewDidLoad()
         setupTimetableScreen()
-        
     }
     
+    // MARK: - Private Methods
     private func setupTimetableScreen() {
         view.backgroundColor = .ypWhite
         setupNavigationBar()
@@ -68,7 +72,7 @@ class TimetableViewController: UIViewController, TimetableViewControllerProtocol
     
     private func setupNavigationBar() {
         if let navigationBar = navigationController?.navigationBar {
-            navigationBar.topItem?.title = "Новая привычка"
+            navigationBar.topItem?.title = "Расписание"
         }
     }
     
@@ -82,7 +86,6 @@ class TimetableViewController: UIViewController, TimetableViewControllerProtocol
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
         ])
-        
     }
     
     @objc
@@ -101,9 +104,9 @@ class TimetableViewController: UIViewController, TimetableViewControllerProtocol
             presenter.selectedWeekdays.remove(at: index)
         }
     }
-    
 }
 
+// MARK: - UITableViewDataSource
 extension TimetableViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         presenter?.weekdays.count ?? 0
@@ -131,6 +134,7 @@ extension TimetableViewController: UITableViewDataSource {
     }
 }
 
+// MARK: - UITableViewDelegate
 extension TimetableViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 75

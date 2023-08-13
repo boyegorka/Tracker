@@ -12,30 +12,38 @@ protocol NewHabitPresenterProtocol {
     var trackerName: String? { get set }
     var subtitleForCategory: String { get set }
     var type: TrackerType { get set }
-    var selectedCategory: TrackerCategory? { get }
+    var selectedCategory: String? { get }
     var schedule: [Int] { get set }
     var isValidForm: Bool { get }
     var sheduleString: String { get }
-    var categoryName: String? { get }
+    var emoji: String? { get set }
+    var color: UIColor? { get set }
+    var pageTitle: String { get }
     func createNewTracker()
 }
 
-protocol NewHabitDelegate {
-    func didCreateTracker(_ tracker: Tracker, at category: TrackerCategory)
+protocol NewHabitDelegate: AnyObject {
+    func didCreateTracker(_ tracker: Tracker, at category: String)
 }
 
 final class NewHabitPresenter: NewHabitPresenterProtocol {
     
-    var delegate: NewHabitDelegate?
+    // MARK: - Public Properties
+    weak var delegate: NewHabitDelegate?
     var trackerName: String?
     var subtitleForCategory: String = ""
-    var categories: [TrackerCategory]
-    var selectedCategory: TrackerCategory?
-    var view: NewHabitViewControllerProtocol?
+    var selectedCategory: String?
+    var emoji: String?
+    var color: UIColor?
     var type: TrackerType
     var schedule: [Int] = []
     var isValidForm: Bool {
-        selectedCategory != nil && trackerName != nil && !schedule.isEmpty
+        switch type {
+        case .habit:
+            return selectedCategory != nil && trackerName != nil && !schedule.isEmpty && emoji != nil && color != nil
+        case .unregularEvent:
+            return selectedCategory != nil && trackerName != nil && emoji != nil && color != nil
+        }
     }
     var sheduleString: String {
         if schedule.count == FormatterDays.weekdays.count {
@@ -44,22 +52,35 @@ final class NewHabitPresenter: NewHabitPresenterProtocol {
             return schedule.map { FormatterDays.shortWeekday(at: $0)}.joined(separator: ", ")
         }
     }
-    var categoryName: String? {
-        selectedCategory?.name
+    var pageTitle: String {
+        switch type {
+        case .habit:
+            return "Новая привычка"
+        case .unregularEvent:
+            return "Новое нерегулярное событие"
+        }
     }
     
-    init(type: TrackerType, categories: [TrackerCategory]) {
+    weak var view: NewHabitViewControllerProtocol?
+    
+    // MARK: - Private Properties
+    private var categories: [String]
+    
+    // MARK: - Initializers
+    init(type: TrackerType, categories: [String]) {
         self.type = type
         self.selectedCategory = categories.first
         self.categories = categories
     }
     
-    
+    // MARK: - Public Methods
     func createNewTracker() {
         guard let name = trackerName,
-              let selectedCategory
+              let selectedCategory,
+              let emoji,
+              let color
         else { return }
-        let newTracker = Tracker(id: UUID(), name: name, color: .ypSelection2 ?? .black, emoji: "🌺", schedule: schedule)
+        let newTracker = Tracker(id: UUID(), name: name, color: color, emoji: emoji, schedule: schedule)
         delegate?.didCreateTracker(newTracker, at: selectedCategory)
     }
 }

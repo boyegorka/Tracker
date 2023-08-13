@@ -9,12 +9,13 @@ import UIKit
 
 final class TabBarController: UITabBarController {
     
+    // MARK: - View Life Cycles
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         self.viewControllers = [getTrackersViewController(), getStatisticViewController()]
     }
     
+    // MARK: - Private Methods
     private func getTrackersViewController() -> UINavigationController {
         let vc = TrackersViewController()
         let presenter = TrackersPresenter()

@@ -7,19 +7,21 @@
 
 import UIKit
 
-protocol TextFieldCellDelegate {
+protocol TextFieldCellDelegate: AnyObject {
     func didTextChange(text: String?)
 }
 
-class TextFieldCell: UITableViewCell {
+final class TextFieldCell: UITableViewCell {
     
-    var delegate: TextFieldCellDelegate?
+    // MARK: - Public Properties
+    weak var delegate: TextFieldCellDelegate?
     
     var placeholder: String? {
         get { textField.placeholder }
         set { textField.placeholder = newValue }
     }
     
+    // MARK: - Private Properties
     private lazy var textField: UITextField = {
         let textField = UITextField()
         textField.translatesAutoresizingMaskIntoConstraints = false
@@ -28,6 +30,7 @@ class TextFieldCell: UITableViewCell {
         return textField
     }()
     
+    // MARK: - Initializers
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupSubviews()
@@ -38,6 +41,7 @@ class TextFieldCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - Private Methods
     private func setupSubviews() {
         addSubviews()
         constraintSubviews()
@@ -59,6 +63,7 @@ class TextFieldCell: UITableViewCell {
     }
 }
 
+// MARK: - UITextFieldDelegate
 extension TextFieldCell: UITextFieldDelegate {
     
     func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {

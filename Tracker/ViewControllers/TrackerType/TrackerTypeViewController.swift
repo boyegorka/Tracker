@@ -7,14 +7,16 @@
 
 import UIKit
 
-protocol TrackerTypeViewControllerProtocol {
+protocol TrackerTypeViewControllerProtocol: AnyObject {
     var presenter: TrackerTypePresenterProtocol? { get }
 }
 
-class TrackerTypeViewController: UIViewController, TrackerTypeViewControllerProtocol {
+final class TrackerTypeViewController: UIViewController, TrackerTypeViewControllerProtocol {
     
+    // MARK: - Public Properties
     var presenter: TrackerTypePresenterProtocol?
     
+    // MARK: - Private Properties
     private lazy var newHabitButton: UIButton = {
         let newHabitButton = UIButton()
         newHabitButton.layer.cornerRadius = 16
@@ -46,11 +48,13 @@ class TrackerTypeViewController: UIViewController, TrackerTypeViewControllerProt
         return buttonsStackView
     }()
     
+    // MARK: - View Life Cycles
     override func viewDidLoad() {
         super.viewDidLoad()
         setupTrackerTypeScreen()
     }
     
+    // MARK: - Private Methods
     private func setupTrackerTypeScreen() {
         view.backgroundColor = .ypWhite
         setupNavigationBar()
@@ -80,14 +84,14 @@ class TrackerTypeViewController: UIViewController, TrackerTypeViewControllerProt
     @objc
     private func pushNewHabitViewController(sender: UIButton) {
         dismiss(animated: true) {
-            self.presenter?.selectType(.Habit)
+            self.presenter?.selectType(.habit)
         }
     }
     
     @objc
     private func pushUnregularEventViewController(sender: UIButton) {
         dismiss(animated: true) {
-            self.presenter?.selectType(.UnregularEvent)
+            self.presenter?.selectType(.unregularEvent)
         }
     }
 }

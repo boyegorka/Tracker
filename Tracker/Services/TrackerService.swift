@@ -6,68 +6,203 @@
 //
 
 import Foundation
+import CoreData
 
-protocol TrackerServiceProtocol {
-    var categories: [TrackerCategory] { get set }
-    var visibleCategories: [TrackerCategory] { get set }
-    var completedTrackers: Set<TrackerRecord> { get set }
+struct TrackerServiceUpdate {
+    let insertedIndexes: IndexSet
+    let deletedIndexes: IndexSet
 }
 
-final class TrackerService: TrackerServiceProtocol {
+protocol TrackerServiceDelegate: AnyObject {
+    func didUpdate(_ update: TrackerServiceUpdate)
+}
+
+protocol TrackerServiceProtocol {
+    var numberOfSections: Int { get }
+    func numberOfRowsInSection(_ section: Int) -> Int
+    func tracker(at: IndexPath) -> Tracker
+    func categoryName(at section: Int) -> String
+    func addTracker(_ traker: Tracker, at category: String) throws
+    func deleteTracker(at indexPath: IndexPath) throws
+}
+
+final class TrackerService: NSObject {
     
-    var categories: [TrackerCategory] = []
-    var visibleCategories: [TrackerCategory] = []
-    var completedTrackers: Set<TrackerRecord> = []
+    // MARK: - Public Properties
+    weak var delegate: TrackerServiceDelegate?
     
-    init() {
-        let tracker = Tracker(id: UUID(), name: "Поливать растения", color: .ypSelection18 ?? .white, emoji: "❤️", schedule: [2])
-        let category = TrackerCategory(name: "Домашний уют", trackers: [tracker])
-        categories.append(category)
-        
-        let tracker1 = Tracker(id: UUID(), name: "Кошка заслонила камеру на созвоне", color: .ypSelection12 ?? .white, emoji: "😻", schedule: [3, 2])
-        let tracker2 = Tracker(id: UUID(), name: "Бабушка прислала открытку в вотсапеБабушка прислала открытку в вотсапе", color: .ypSelection16 ?? .white, emoji: "🌺", schedule: [2])
-        let tracker3 = Tracker(id: UUID(), name: "Свидания в апреле", color: .ypSelection11 ?? .white, emoji: "❤️", schedule: [3, 2])
-        let category2 = TrackerCategory(name: "Радостные мелочи", trackers: [tracker1, tracker2, tracker3])
-        categories.append(category2)
-    }
+    // MARK: - Private Properties
+    private var trackerStore: TrackerStore?
+    private var trackerCategoryStore: TrackerCategoryStore?
+    private var trackerRecordStore: TrackerRecordStore?
     
-    func addTracker(_ tracker: Tracker, at category: TrackerCategory) {
-        var trackers = category.trackers
-        trackers.append(tracker)
-        let newCategory = TrackerCategory(name: category.name, trackers: trackers)
-        var categories = self.categories
-        if let index = categories.firstIndex(where: { $0.name == category.name } ) {
-            categories[index] = newCategory
-        } else {
-            categories.append(newCategory)
-        }
-        self.categories = categories
-    }
+    private var insertedIndexes: IndexSet?
+    private var deletedIndexes: IndexSet?
     
-    func getCategoriesFor(date: Date, search: String) -> [TrackerCategory] {
-        let weekday = date.weekdayIndex
-        var result: [TrackerCategory] = []
-        for category in categories {
-            let trackers = search.isEmpty ? category.trackers.filter({ $0.schedule.contains(weekday) }) : category.trackers.filter({ $0.schedule.contains(weekday) && $0.name.contains(search) })
-            if !trackers.isEmpty {
-                let newCategory = TrackerCategory(name: category.name, trackers: trackers)
-                result.append(newCategory)
+    private lazy var persistentContainer: NSPersistentContainer = {
+        let container = NSPersistentContainer(name: "Model")
+        container.loadPersistentStores { (storeDescription, error) in
+            if let error = error as NSError? {
+                print("Ошибка в EmojiMixCoreData")
             }
         }
-        return result
+        return container
+    }()
+    
+    private lazy var fetchedResultsController: NSFetchedResultsController<TrackerCoreData> = {
+        
+        let fetchRequest = TrackerCoreData.fetchRequest()
+        fetchRequest.sortDescriptors = [
+            NSSortDescriptor(keyPath: \TrackerCategoryCoreData.name, ascending: true)
+        ]
+        
+        let controller = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: persistentContainer.viewContext, sectionNameKeyPath: "category.name", cacheName: nil)
+        controller.delegate = self
+        try? controller.performFetch()
+        return controller
+    }()
+    
+    // MARK: - Initializers
+    override init() {
+        super.init()
+        self.trackerStore = TrackerStore(context: persistentContainer.viewContext)
+        self.trackerCategoryStore = TrackerCategoryStore(context: persistentContainer.viewContext)
+        self.trackerRecordStore = TrackerRecordStore(context: persistentContainer.viewContext)
+        addTestCategory()
     }
     
-    func addToCompletedTrackers(tracker: Tracker, date: Date) {
-        var completedTrackers = self.completedTrackers
-        let trackerToRecord = TrackerRecord(id: tracker.id, date: date)
-        completedTrackers.insert(trackerToRecord)
-        self.completedTrackers = completedTrackers
+    // MARK: - Public Methods
+    func updatePredicate(search: String, date: Date) {
+        let weekday = String(date.weekdayIndex)
+        let namePredicate = NSPredicate(format: "%K CONTAINS[cd] %@", #keyPath(TrackerCoreData.name), search)
+        let datePredicate = NSPredicate(format: "%K CONTAINS[cd] %@", #keyPath(TrackerCoreData.schedule), weekday)
+        
+//        if search.count != 0 {
+//            fetchedResultsController.fetchRequest.predicate = NSCompoundPredicate(type: .and, subpredicates: [namePredicate, datePredicate])
+//        } else {
+//            fetchedResultsController.fetchRequest.predicate = datePredicate
+//        }
+        
+        // на данный момент все нерегулярные привычки показываются только "сегодня" оставил закомментированный код выше, чтобы мог быстро вернуть всё обратно. Напишите пожалуйста, в какой момент нерегулярные привычки должны показываться? В макете в фигме непонятно.
+        
+        if date.onlyDate == Date().onlyDate {
+            if search.count != 0 {
+                fetchedResultsController.fetchRequest.predicate = namePredicate
+            } else {
+                fetchedResultsController.fetchRequest.predicate = NSPredicate(value: true)
+            }
+        } else {
+            if search.count != 0 {
+                fetchedResultsController.fetchRequest.predicate = NSCompoundPredicate(type: .and, subpredicates: [namePredicate, datePredicate])
+            } else {
+                fetchedResultsController.fetchRequest.predicate = datePredicate
+            }
+        }
+        try? fetchedResultsController.performFetch()
     }
     
-    func removeFromCompletedTrackers(tracker: Tracker, date: Date) {
-        var completedTrackers = self.completedTrackers
-        let trackerToRemove = TrackerRecord(id: tracker.id, date: date)
-        completedTrackers.remove(trackerToRemove)
-        self.completedTrackers = completedTrackers
+    func getAllCategories() -> [String] {
+        trackerCategoryStore?.getCategoryNames() ?? []
+    }
+    
+    func getTrackerRecord(tracker: Tracker, date: Date) -> TrackerRecord? {
+        trackerRecordStore?.getTrackerRecordFromCoreData(tracker: tracker, date: date)
+    }
+    
+    func getTrackersNumber(tracker: Tracker) -> Int {
+        trackerRecordStore?.getTrackerRecordsNumber(tracker: tracker) ?? 0
+    }
+    
+    func addToCompletedTrackers(tracker: Tracker, date: Date) throws {
+        try trackerRecordStore?.addNewTrackerRecord(tracker, date: date)
+    }
+    
+    func removeFromCompletedTrackers(tracker: Tracker, date: Date) throws {
+        try trackerRecordStore?.deleteTrackerRecord(tracker, date: date)
+    }
+    
+    // MARK: - Private Methods
+    private func addTestCategory() {
+        if fetchedResultsController.sections?.count ?? 0 == 0 {
+            do {
+                try trackerCategoryStore?.addCategory(name: "test")
+                try trackerCategoryStore?.addCategory(name: "test2")
+                let tracker1 = Tracker(id: UUID(), name: "Поливать растения", color: .ypSelection18, emoji: "❤️", schedule: [2])
+                try addTracker(tracker1, at: "test")
+                let tracker2 = Tracker(id: UUID(), name: "Поливать растения2", color: .ypSelection18, emoji: "❤️", schedule: [0,1,2,3,4,5,6])
+                try addTracker(tracker2, at: "test2")
+            } catch {
+                
+            }
+        }
+    }
+}
+
+// MARK: - TrackerServiceProtocol
+
+extension TrackerService: TrackerServiceProtocol {
+    
+    var numberOfSections: Int {
+        fetchedResultsController.sections?.count ?? 0
+    }
+    
+    func numberOfRowsInSection(_ section: Int) -> Int {
+        fetchedResultsController.sections?[section].numberOfObjects ?? 0
+    }
+    
+    func tracker(at indexPath: IndexPath) -> Tracker {
+        trackerStore?.getTrackerFromCoreData(from: fetchedResultsController.object(at: indexPath)) ?? Tracker(id: UUID(), name: "test", color: .gray, emoji: "", schedule: [])
+    }
+    
+    func categoryName(at section: Int) -> String {
+        fetchedResultsController.object(at: IndexPath(item: 0, section: section)).category.name
+    }
+    
+    func addTracker(_ traker: Tracker, at category: String) throws {
+        if let categoryCoreData = trackerCategoryStore?.getCategoryWithName(category) {
+            try? trackerStore?.addNewTracker(traker, at: categoryCoreData)
+        }
+    }
+    
+    func deleteTracker(at indexPath: IndexPath) throws {
+        // let traker = fetchedResultsController.object(at: indexPath)
+        // try? trackerStore.delete(traker)
+    }
+    
+}
+
+// MARK: - NSFetchedResultsControllerDelegate
+
+extension TrackerService: NSFetchedResultsControllerDelegate {
+    
+    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        insertedIndexes = IndexSet()
+        deletedIndexes = IndexSet()
+    }
+    
+    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        delegate?.didUpdate(TrackerServiceUpdate(
+            insertedIndexes: insertedIndexes ?? IndexSet(),
+            deletedIndexes: deletedIndexes ?? IndexSet()
+        )
+        )
+        insertedIndexes = nil
+        deletedIndexes = nil
+    }
+    
+    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
+        
+        switch type {
+        case .delete:
+            if let indexPath = indexPath {
+                deletedIndexes?.insert(indexPath.item)
+            }
+        case .insert:
+            if let indexPath = newIndexPath {
+                insertedIndexes?.insert(indexPath.item)
+            }
+        default:
+            break
+        }
     }
 }
