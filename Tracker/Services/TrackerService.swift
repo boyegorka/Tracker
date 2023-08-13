@@ -77,10 +77,26 @@ final class TrackerService: NSObject {
         let namePredicate = NSPredicate(format: "%K CONTAINS[cd] %@", #keyPath(TrackerCoreData.name), search)
         let datePredicate = NSPredicate(format: "%K CONTAINS[cd] %@", #keyPath(TrackerCoreData.schedule), weekday)
         
-        if search.count != 0 {
-            fetchedResultsController.fetchRequest.predicate = NSCompoundPredicate(type: .and, subpredicates: [namePredicate, datePredicate])
+//        if search.count != 0 {
+//            fetchedResultsController.fetchRequest.predicate = NSCompoundPredicate(type: .and, subpredicates: [namePredicate, datePredicate])
+//        } else {
+//            fetchedResultsController.fetchRequest.predicate = datePredicate
+//        }
+        
+        // на данный момент все нерегулярные привычки показываются только "сегодня" оставил закомментированный код выше, чтобы мог быстро вернуть всё обратно. Напишите пожалуйста, в какой момент нерегулярные привычки должны показываться? В макете в фигме непонятно.
+        
+        if date.onlyDate == Date().onlyDate {
+            if search.count != 0 {
+                fetchedResultsController.fetchRequest.predicate = namePredicate
+            } else {
+                fetchedResultsController.fetchRequest.predicate = NSPredicate(value: true)
+            }
         } else {
-            fetchedResultsController.fetchRequest.predicate = datePredicate
+            if search.count != 0 {
+                fetchedResultsController.fetchRequest.predicate = NSCompoundPredicate(type: .and, subpredicates: [namePredicate, datePredicate])
+            } else {
+                fetchedResultsController.fetchRequest.predicate = datePredicate
+            }
         }
         try? fetchedResultsController.performFetch()
     }

@@ -7,14 +7,14 @@
 
 import UIKit
 
-protocol TextFieldCellDelegate {
+protocol TextFieldCellDelegate: AnyObject {
     func didTextChange(text: String?)
 }
 
 final class TextFieldCell: UITableViewCell {
     
     // MARK: - Public Properties
-    var delegate: TextFieldCellDelegate?
+    weak var delegate: TextFieldCellDelegate?
     
     var placeholder: String? {
         get { textField.placeholder }

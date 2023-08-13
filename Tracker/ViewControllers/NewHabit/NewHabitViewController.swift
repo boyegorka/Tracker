@@ -116,7 +116,7 @@ final class NewHabitViewController: UIViewController, NewHabitViewControllerProt
     
     private func setupNavigationBar() {
         if let navigationBar = navigationController?.navigationBar {
-            navigationBar.topItem?.title = "Новая привычка"
+            navigationBar.topItem?.title = presenter?.pageTitle
         }
     }
     

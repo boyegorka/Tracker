@@ -18,17 +18,18 @@ protocol NewHabitPresenterProtocol {
     var sheduleString: String { get }
     var emoji: String? { get set }
     var color: UIColor? { get set }
+    var pageTitle: String { get }
     func createNewTracker()
 }
 
-protocol NewHabitDelegate {
+protocol NewHabitDelegate: AnyObject {
     func didCreateTracker(_ tracker: Tracker, at category: String)
 }
 
 final class NewHabitPresenter: NewHabitPresenterProtocol {
     
     // MARK: - Public Properties
-    var delegate: NewHabitDelegate?
+    weak var delegate: NewHabitDelegate?
     var trackerName: String?
     var subtitleForCategory: String = ""
     var selectedCategory: String?
@@ -37,7 +38,12 @@ final class NewHabitPresenter: NewHabitPresenterProtocol {
     var type: TrackerType
     var schedule: [Int] = []
     var isValidForm: Bool {
-        selectedCategory != nil && trackerName != nil && !schedule.isEmpty && emoji != nil && color != nil
+        switch type {
+        case .habit:
+            return selectedCategory != nil && trackerName != nil && !schedule.isEmpty && emoji != nil && color != nil
+        case .unregularEvent:
+            return selectedCategory != nil && trackerName != nil && emoji != nil && color != nil
+        }
     }
     var sheduleString: String {
         if schedule.count == FormatterDays.weekdays.count {
@@ -46,6 +52,15 @@ final class NewHabitPresenter: NewHabitPresenterProtocol {
             return schedule.map { FormatterDays.shortWeekday(at: $0)}.joined(separator: ", ")
         }
     }
+    var pageTitle: String {
+        switch type {
+        case .habit:
+            return "Новая привычка"
+        case .unregularEvent:
+            return "Новое нерегулярное событие"
+        }
+    }
+    
     weak var view: NewHabitViewControllerProtocol?
     
     // MARK: - Private Properties

@@ -7,7 +7,7 @@
 
 import UIKit
 
-protocol CollectionCellDelegate {
+protocol CollectionCellDelegate: AnyObject {
     func didEmojiSet(emoji: String?)
     func didColorSet(color: UIColor?)
 }
@@ -32,7 +32,7 @@ final class CollectionCell: UITableViewCell {
     }
     
     // MARK: - Public Properties
-    var delegate: CollectionCellDelegate?
+    weak var delegate: CollectionCellDelegate?
     
     var type: CollectionCellType = .emoji(items: []) {
         didSet {

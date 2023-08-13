@@ -14,7 +14,7 @@ protocol TrackerCollectionViewCellDelegate: AnyObject {
 final class TrackerCollectionViewCell: UICollectionViewCell {
     
     // MARK: - Public Properties
-    var delegate: TrackerCollectionViewCellDelegate?
+    weak var delegate: TrackerCollectionViewCellDelegate?
     
     var viewModel: TrackerCellViewModel? {
         didSet {

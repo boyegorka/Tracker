@@ -12,14 +12,14 @@ protocol TrackerTypePresenterProtocol {
     func selectType(_ type: TrackerType)
 }
 
-protocol TrackerTypeDelegate {
+protocol TrackerTypeDelegate: AnyObject {
     func didSelectType(_ type: TrackerType)
 }
 
 final class TrackerTypePresenter: TrackerTypePresenterProtocol {
     
     // MARK: - Public Properties
-    var delegate: TrackerTypeDelegate?
+    weak var delegate: TrackerTypeDelegate?
     weak var view: TrackerTypeViewControllerProtocol?
     
     // MARK: - Public Methods
