@@ -172,8 +172,8 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
 extension TrackersViewController: TrackerTypeDelegate {
     
     func didSelectType(_ type: TrackerType) {
-        let vc = NewHabitViewController()
-        let presenter = NewHabitPresenter(type: type, categories: presenter?.caregories ?? [])
+        let vc = NewTrackerViewController()
+        let presenter = NewTrackerPresenter(type: type, categories: presenter?.caregories ?? [])
         
         vc.presenter = presenter
         presenter.view = vc
@@ -193,7 +193,6 @@ extension TrackersViewController: NewHabitDelegate {
     
     func didCreateTracker(_ tracker: Tracker, at category: String) {
         presenter?.addTracker(tracker, at: category)
-        trackersCollectionView.reloadData()
     }
 }
 

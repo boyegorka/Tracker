@@ -24,6 +24,7 @@ final class TimetableViewController: UIViewController, TimetableViewControllerPr
     // MARK: - Private Properties
     private lazy var tableView: UITableView = {
         var timetable = UITableView(frame: .zero, style: .insetGrouped)
+        timetable.translatesAutoresizingMaskIntoConstraints = false
         timetable.separatorStyle = .singleLine
         timetable.contentInsetAdjustmentBehavior = .never
         timetable.backgroundColor = .ypWhite
@@ -38,16 +39,7 @@ final class TimetableViewController: UIViewController, TimetableViewControllerPr
     
     private lazy var readyButton: UIButton = {
         let readyButton = UIButton()
-        view.addSubview(readyButton)
         readyButton.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            readyButton.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 20),
-            readyButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
-            readyButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-            readyButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
-            readyButton.heightAnchor.constraint(equalToConstant: 60)
-            
-        ])
         readyButton.layer.cornerRadius = 16
         readyButton.backgroundColor = .ypBlack
         readyButton.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
@@ -67,6 +59,7 @@ final class TimetableViewController: UIViewController, TimetableViewControllerPr
         view.backgroundColor = .ypWhite
         setupNavigationBar()
         addSubViews()
+        contstraintSubviews()
         readyButton.setTitle("Готово", for: .normal)
     }
     
@@ -77,14 +70,22 @@ final class TimetableViewController: UIViewController, TimetableViewControllerPr
     }
     
     private func addSubViews() {
-        
         view.addSubview(tableView)
-        tableView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(readyButton)
+    }
+    
+    private func contstraintSubviews() {
         NSLayoutConstraint.activate([
             tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             tableView.bottomAnchor.constraint(equalTo: readyButton.topAnchor, constant: 24),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            
+            readyButton.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: 20),
+            readyButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            readyButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            readyButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
+            readyButton.heightAnchor.constraint(equalToConstant: 60)
         ])
     }
     

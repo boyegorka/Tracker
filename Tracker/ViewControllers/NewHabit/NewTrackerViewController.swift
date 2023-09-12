@@ -1,5 +1,5 @@
 //
-//  NewHabitViewController.swift
+//  NewTrackerViewController.swift
 //  Tracker
 //
 //  Created by Егор Свистушкин on 28.06.2023.
@@ -7,11 +7,11 @@
 
 import UIKit
 
-protocol NewHabitViewControllerProtocol: AnyObject {
-    var presenter: NewHabitPresenterProtocol? { get }
+protocol NewTrackerViewControllerProtocol: AnyObject {
+    var presenter: NewTrackerPresenterProtocol? { get }
 }
 
-final class NewHabitViewController: UIViewController, NewHabitViewControllerProtocol {
+final class NewTrackerViewController: UIViewController, NewTrackerViewControllerProtocol {
     
     // MARK: - Enums
     enum Constant {
@@ -37,7 +37,7 @@ final class NewHabitViewController: UIViewController, NewHabitViewControllerProt
     }
     
     // MARK: - Public Properties
-    var presenter: NewHabitPresenterProtocol?
+    var presenter: NewTrackerPresenterProtocol?
     
     // MARK: - Private Properties
     private let emojis: [String] = ["🙂", "😻", "🌺", "🐶", "❤️", "😱", "😇", "😡", "🥶", "🤔", "🙌", "🍔", "🥦", "🏓", "🥇", "🎸", "🏝️", "😪"]
@@ -200,7 +200,14 @@ final class NewHabitViewController: UIViewController, NewHabitViewControllerProt
     }
     
     private func showCategory() {
-        
+        let vc = CategoriesViewController()
+        let viewModel = CategoriesViewModel(selectedCategory: presenter?.selectedCategory, delegate: self)
+        vc.viewModel = viewModel
+        vc.modalPresentationStyle = .formSheet
+        vc.modalTransitionStyle = .coverVertical
+        vc.isModalInPresentation = false
+        let navigationController = UINavigationController(rootViewController: vc)
+        self.present(navigationController, animated: true)
     }
     
     private func updateButtonState() {
@@ -221,7 +228,7 @@ final class NewHabitViewController: UIViewController, NewHabitViewControllerProt
 }
 
 // MARK: - TimetableDelegate
-extension NewHabitViewController: TimetableDelegate {
+extension NewTrackerViewController: TimetableDelegate {
     
     func didSelect(weekdays: [Int]) {
         presenter?.schedule = weekdays
@@ -233,8 +240,20 @@ extension NewHabitViewController: TimetableDelegate {
     }
 }
 
+// MARK: - CategoriesDelegate
+extension NewTrackerViewController: CategoriesDelegate {
+    func didSelectCategory(_ name: String) {
+        presenter?.selectedCategory = name
+        updateButtonState()
+        let section = Section.planning
+        if let row = rowsForSection(section).firstIndex(of: Section.Row.category) {
+            tableView.reloadRows(at: [IndexPath(row: row, section: section.rawValue)], with: .none)
+        }
+    }
+}
+
 // MARK: - TextFieldCellDelegate
-extension NewHabitViewController: TextFieldCellDelegate {
+extension NewTrackerViewController: TextFieldCellDelegate {
     
     func didTextChange(text: String?) {
         presenter?.trackerName = text
@@ -243,7 +262,7 @@ extension NewHabitViewController: TextFieldCellDelegate {
 }
 
 // MARK: - CollectionCellDelegate
-extension NewHabitViewController: CollectionCellDelegate {
+extension NewTrackerViewController: CollectionCellDelegate {
     
     func didEmojiSet(emoji: String?) {
         presenter?.emoji = emoji
@@ -257,7 +276,7 @@ extension NewHabitViewController: CollectionCellDelegate {
 }
 
 // MARK: - UITableViewDataSource
-extension NewHabitViewController: UITableViewDataSource {
+extension NewTrackerViewController: UITableViewDataSource {
     
     func numberOfSections(in tableView: UITableView) -> Int {
         Section.allCases.count
@@ -287,7 +306,7 @@ extension NewHabitViewController: UITableViewDataSource {
 }
 
 // MARK: - UITableViewDelegate
-extension NewHabitViewController: UITableViewDelegate {
+extension NewTrackerViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         guard let section = Section(rawValue: indexPath.section) else { return }

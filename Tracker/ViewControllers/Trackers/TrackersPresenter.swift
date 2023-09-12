@@ -119,11 +119,24 @@ extension TrackersPresenter: TrackerServiceDelegate {
     
     func didUpdate(_ update: TrackerServiceUpdate) {
         guard let view else { return }
+        
+        let count = view.trackersCollectionView.numberOfSections
+        let newSection: IndexSet = IndexSet(update.insertedIndexes.filter({$0.section >= count}).map{ $0.section })
+        
         view.trackersCollectionView.performBatchUpdates {
-            let insertedIndexPaths = update.insertedIndexes.map { IndexPath(item: $0, section: 0) }
-            let deletedIndexPaths = update.deletedIndexes.map { IndexPath(item: $0, section: 0) }
-            view.trackersCollectionView.insertItems(at: insertedIndexPaths)
-            view.trackersCollectionView.deleteItems(at: deletedIndexPaths)
+            let insertedIndexPaths = update.insertedIndexes
+            let deletedIndexPaths = update.deletedIndexes
+            
+            
+            
+            if !insertedIndexPaths.isEmpty {
+                view.trackersCollectionView.insertSections(newSection)
+                view.trackersCollectionView.insertItems(at: insertedIndexPaths)
+            }
+            if !deletedIndexPaths.isEmpty {
+                view.trackersCollectionView.deleteItems(at: deletedIndexPaths)
+            }
         }
+        //view.trackersCollectionView.reloadData()
     }
 }
