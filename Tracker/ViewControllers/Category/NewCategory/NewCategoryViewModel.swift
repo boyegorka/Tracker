@@ -14,7 +14,7 @@ protocol NewCategoryDelegate: AnyObject  {
 final class NewCategoryViewModel {
     
     // MARK: - Public Properties
-    var delegate: NewCategoryDelegate?
+    private weak var delegate: NewCategoryDelegate?
     var categoryName: String? {
         didSet {
             isValidForm = !(categoryName?.isEmpty ?? true)
@@ -24,6 +24,11 @@ final class NewCategoryViewModel {
     // MARK: - Private Properties
     private let service = TrackerService()
     @Observable private(set) var isValidForm: Bool = false
+    
+    // MARK: - View Life Cycles
+    init(delegate: NewCategoryDelegate) {
+        self.delegate = delegate
+    }
     
     // MARK: - Public Methods
     func createNewCategory() throws {

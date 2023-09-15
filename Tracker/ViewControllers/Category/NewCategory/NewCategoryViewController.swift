@@ -7,10 +7,10 @@
 
 import UIKit
 
-class NewCategoryViewController: UIViewController {
+final class NewCategoryViewController: UIViewController {
     
     // MARK: - Public Properties
-    var viewModel: NewCategoryViewModel?
+    private var viewModel: NewCategoryViewModel!
     
     // MARK: - Private Properties
     private lazy var newCategoryNameTextField: UITextField = {
@@ -54,6 +54,16 @@ class NewCategoryViewController: UIViewController {
     }()
     
     // MARK: - View Life Cycles
+    
+    init(viewModel: NewCategoryViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupScreen()
@@ -109,7 +119,6 @@ class NewCategoryViewController: UIViewController {
     @objc
     private func addNewCategory() throws {
         try viewModel?.createNewCategory()
-        NotificationCenter.default.post(name: NSNotification.Name("NewCategoryDismissed"), object: nil)
         dismiss(animated: true)
     }
 }

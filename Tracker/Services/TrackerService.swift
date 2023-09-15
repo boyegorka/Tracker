@@ -20,7 +20,7 @@ protocol TrackerServiceDelegate: AnyObject {
 protocol TrackerServiceProtocol {
     var numberOfSections: Int { get }
     func numberOfRowsInSection(_ section: Int) -> Int
-    func tracker(at: IndexPath) -> Tracker
+    func tracker(at: IndexPath) -> Tracker?
     func categoryName(at section: Int) -> String
     func addTracker(_ traker: Tracker, at category: String) throws
     func deleteTracker(at indexPath: IndexPath) throws
@@ -49,18 +49,7 @@ final class TrackerService: NSObject {
         return container
     }()
     
-    private lazy var fetchedResultsController: NSFetchedResultsController<TrackerCoreData> = {
-        
-        let fetchRequest = TrackerCoreData.fetchRequest()
-        fetchRequest.sortDescriptors = [
-            NSSortDescriptor(keyPath: \TrackerCategoryCoreData.name, ascending: true)
-        ]
-        
-        let controller = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: persistentContainer.viewContext, sectionNameKeyPath: "category.name", cacheName: nil)
-        controller.delegate = self
-        try? controller.performFetch()
-        return controller
-    }()
+    private var fetchedResultsController: NSFetchedResultsController<TrackerCoreData>?
     
     // MARK: - Initializers
     override init() {
@@ -71,34 +60,28 @@ final class TrackerService: NSObject {
     }
     
     // MARK: - Public Methods
-    func updatePredicate(search: String, date: Date) {
+    func fetch(search: String, date: Date) {
+
+        let fetchRequest = TrackerCoreData.fetchRequest()
+        fetchRequest.sortDescriptors = [
+            NSSortDescriptor(keyPath: \TrackerCoreData.category.name, ascending: true)
+        ]
+
         let weekday = String(date.weekdayIndex)
         let namePredicate = NSPredicate(format: "%K CONTAINS[cd] %@", #keyPath(TrackerCoreData.name), search)
-        let datePredicate = NSPredicate(format: "%K CONTAINS[cd] %@", #keyPath(TrackerCoreData.schedule), weekday)
-        
-//        if search.count != 0 {
-//            fetchedResultsController.fetchRequest.predicate = NSCompoundPredicate(type: .and, subpredicates: [namePredicate, datePredicate])
-//        } else {
-//            fetchedResultsController.fetchRequest.predicate = datePredicate
-//        }
-        
-        // Изменить отображение так, чтобы нерегулярные события показывались каждый день
-        
-        if date.onlyDate == Date().onlyDate {
-            if search.count != 0 {
-                fetchedResultsController.fetchRequest.predicate = namePredicate
-            } else {
-                fetchedResultsController.fetchRequest.predicate = NSPredicate(value: true)
-            }
+
+        let datePredicate = NSPredicate(format: "%K CONTAINS[cd] %@ OR %K == ''", #keyPath(TrackerCoreData.schedule), weekday, #keyPath(TrackerCoreData.schedule))
+
+        if search.count != 0 {
+            fetchRequest.predicate = NSCompoundPredicate(type: .and, subpredicates: [namePredicate, datePredicate])
         } else {
-            if search.count != 0 {
-                fetchedResultsController.fetchRequest.predicate = NSCompoundPredicate(type: .and, subpredicates: [namePredicate, datePredicate])
-            } else {
-                fetchedResultsController.fetchRequest.predicate = datePredicate
-            }
+            fetchRequest.predicate = datePredicate
         }
-        
-        try? fetchedResultsController.performFetch()
+
+        let fetchedController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: persistentContainer.viewContext, sectionNameKeyPath: #keyPath(TrackerCoreData.category.name), cacheName: nil)
+        fetchedController.delegate = self
+        fetchedResultsController = fetchedController
+        try? fetchedController.performFetch()
     }
     
     func getAllCategories() -> [String] {
@@ -131,19 +114,20 @@ final class TrackerService: NSObject {
 extension TrackerService: TrackerServiceProtocol {
     
     var numberOfSections: Int {
-        fetchedResultsController.sections?.count ?? 0
+        fetchedResultsController?.sections?.count ?? 0
     }
     
     func numberOfRowsInSection(_ section: Int) -> Int {
-        fetchedResultsController.sections?[section].numberOfObjects ?? 0
+        fetchedResultsController?.sections?[section].numberOfObjects ?? 0
     }
     
-    func tracker(at indexPath: IndexPath) -> Tracker {
-        trackerStore?.getTrackerFromCoreData(from: fetchedResultsController.object(at: indexPath)) ?? Tracker(id: UUID(), name: "test", color: .gray, emoji: "", schedule: [])
+    func tracker(at indexPath: IndexPath) -> Tracker? {
+        guard let fetchedResultsController else { return nil}
+        return trackerStore?.getTrackerFromCoreData(from: fetchedResultsController.object(at: indexPath))
     }
     
     func categoryName(at section: Int) -> String {
-        fetchedResultsController.object(at: IndexPath(item: 0, section: section)).category.name
+        fetchedResultsController?.object(at: IndexPath(item: 0, section: section)).category.name ?? ""
     }
     
     func addTracker(_ traker: Tracker, at category: String) throws {
@@ -192,6 +176,7 @@ extension TrackerService: NSFetchedResultsControllerDelegate {
             }
         case .insert:
             if let indexPath = newIndexPath {
+                print(indexPath)
                 insertedIndexes.append(indexPath)
             }
         default:

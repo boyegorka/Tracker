@@ -200,9 +200,8 @@ final class NewTrackerViewController: UIViewController, NewTrackerViewController
     }
     
     private func showCategory() {
-        let vc = CategoriesViewController()
         let viewModel = CategoriesViewModel(selectedCategory: presenter?.selectedCategory, delegate: self)
-        vc.viewModel = viewModel
+        let vc = CategoriesViewController(viewModel: viewModel)
         vc.modalPresentationStyle = .formSheet
         vc.modalTransitionStyle = .coverVertical
         vc.isModalInPresentation = false
@@ -256,7 +255,12 @@ extension NewTrackerViewController: CategoriesDelegate {
 extension NewTrackerViewController: TextFieldCellDelegate {
     
     func didTextChange(text: String?) {
-        presenter?.trackerName = text
+        guard let text else { return }
+        if !text.isEmpty {
+            presenter?.trackerName = text
+        } else {
+            presenter?.trackerName = nil
+        }
         updateButtonState()
     }
 }

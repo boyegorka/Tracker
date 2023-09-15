@@ -19,7 +19,7 @@ final class CategoriesViewController: UIViewController {
     }
     
     // MARK: - Public Properties
-    var viewModel: CategoriesViewModel?
+    private var viewModel: CategoriesViewModel!
     
     // MARK: - Private Properties
     private lazy var categoriesTableView: UITableView = {
@@ -88,19 +88,20 @@ final class CategoriesViewController: UIViewController {
     
     
     // MARK: - View Life Cycles
+    
+    init(viewModel: CategoriesViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupScreen()
         viewModel?.getCategories()
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        NotificationCenter.default.removeObserver(self, name: NSNotification.Name("NewCategoryDismissed"), object: nil)
     }
     
     // MARK: - Private Methods
@@ -159,10 +160,8 @@ final class CategoriesViewController: UIViewController {
     
     @objc
     private func showNewCategoryScreen() {
-        let vc = NewCategoryViewController()
-        let viewModel = NewCategoryViewModel()
-        vc.viewModel = viewModel
-        viewModel.delegate = self
+        let viewModel = NewCategoryViewModel(delegate: self)
+        let vc = NewCategoryViewController(viewModel: viewModel)
         vc.modalPresentationStyle = .formSheet
         vc.modalTransitionStyle = .coverVertical
         let navigationController = UINavigationController(rootViewController: vc)
