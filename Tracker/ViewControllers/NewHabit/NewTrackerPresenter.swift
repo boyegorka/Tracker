@@ -1,5 +1,5 @@
 //
-//  NewHabitPresenter.swift
+//  NewTrackerPresenter.swift
 //  Tracker
 //
 //  Created by Егор Свистушкин on 10.07.2023.
@@ -7,12 +7,12 @@
 
 import UIKit
 
-protocol NewHabitPresenterProtocol {
-    var view: NewHabitViewControllerProtocol? { get }
+protocol NewTrackerPresenterProtocol {
+    var view: NewTrackerViewControllerProtocol? { get }
     var trackerName: String? { get set }
     var subtitleForCategory: String { get set }
     var type: TrackerType { get set }
-    var selectedCategory: String? { get }
+    var selectedCategory: String? { get set }
     var schedule: [Int] { get set }
     var isValidForm: Bool { get }
     var sheduleString: String { get }
@@ -26,10 +26,12 @@ protocol NewHabitDelegate: AnyObject {
     func didCreateTracker(_ tracker: Tracker, at category: String)
 }
 
-final class NewHabitPresenter: NewHabitPresenterProtocol {
+final class NewTrackerPresenter: NewTrackerPresenterProtocol {
     
     // MARK: - Public Properties
     weak var delegate: NewHabitDelegate?
+    weak var view: NewTrackerViewControllerProtocol?
+
     var trackerName: String?
     var subtitleForCategory: String = ""
     var selectedCategory: String?
@@ -61,15 +63,12 @@ final class NewHabitPresenter: NewHabitPresenterProtocol {
         }
     }
     
-    weak var view: NewHabitViewControllerProtocol?
-    
     // MARK: - Private Properties
     private var categories: [String]
     
     // MARK: - Initializers
     init(type: TrackerType, categories: [String]) {
         self.type = type
-        self.selectedCategory = categories.first
         self.categories = categories
     }
     

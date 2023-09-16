@@ -11,6 +11,7 @@ protocol TrackersViewControllerProtocol: AnyObject {
     var presenter: TrackersPresenterProtocol? { get }
     var trackersCollectionView: UICollectionView { get }
     func setupEmptyScreen()
+    func updateView()
 }
 
 final class TrackersViewController: UIViewController, TrackersViewControllerProtocol {
@@ -33,6 +34,7 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
         collectionView.showsVerticalScrollIndicator = false
         collectionView.dataSource = self
         collectionView.delegate = self
+        collectionView.alwaysBounceVertical = true
         collectionView.contentInset = UIEdgeInsets(top: 24, left: Contstants.contentInsets, bottom: 24, right: Contstants.contentInsets)
         collectionView.register(TrackerCollectionViewCell.self, forCellWithReuseIdentifier: Contstants.cellIdentifier)
         collectionView.register(SupplementaryView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: Contstants.headerIdentifier)
@@ -101,6 +103,10 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
         trackersCollectionView.isHidden = isEmpty
     }
     
+    func updateView() {
+        trackersCollectionView.reloadData()
+    }
+    
     // MARK: - Private Methods
     private func setupNavigationBar() {
         guard let navigationBar = navigationController?.navigationBar else { return }
@@ -136,8 +142,8 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
         NSLayoutConstraint.activate([
             trackersCollectionView.topAnchor.constraint(equalTo: view.topAnchor),
             trackersCollectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            trackersCollectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-            trackersCollectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+            trackersCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            trackersCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             
             emptyScreenView.topAnchor.constraint(equalTo: view.topAnchor),
             emptyScreenView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
@@ -164,7 +170,6 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
     @objc
     private func setDateForTrackers(_ sender: UIDatePicker) {
         presenter?.currentDate = sender.date
-        trackersCollectionView.reloadData()
     }
 }
 
@@ -172,8 +177,8 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
 extension TrackersViewController: TrackerTypeDelegate {
     
     func didSelectType(_ type: TrackerType) {
-        let vc = NewHabitViewController()
-        let presenter = NewHabitPresenter(type: type, categories: presenter?.caregories ?? [])
+        let vc = NewTrackerViewController()
+        let presenter = NewTrackerPresenter(type: type, categories: presenter?.caregories ?? [])
         
         vc.presenter = presenter
         presenter.view = vc
@@ -193,7 +198,6 @@ extension TrackersViewController: NewHabitDelegate {
     
     func didCreateTracker(_ tracker: Tracker, at category: String) {
         presenter?.addTracker(tracker, at: category)
-        trackersCollectionView.reloadData()
     }
 }
 
@@ -265,11 +269,9 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
 extension TrackersViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         presenter?.search = searchText
-        trackersCollectionView.reloadData()
     }
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         presenter?.search = ""
-        trackersCollectionView.reloadData()
     }
 }
