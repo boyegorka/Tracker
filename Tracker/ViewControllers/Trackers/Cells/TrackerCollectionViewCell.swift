@@ -33,6 +33,8 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     }()
     
     // MARK: - Private Properties
+    private var analytics: AnalyticsService = AnalyticsService()
+    
     private var daysCounter: Int = 0 {
         didSet {
             updateCounterLabel()
@@ -175,8 +177,10 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     private func checkForToday() {
         if comletedTracker {
             daysCounter -= 1
+            analytics.report(event: "click", params: ["screen":"trackers_screen", "item":"uncomplete_tracker"])
         } else {
             daysCounter += 1
+            analytics.report(event: "click", params: ["screen":"trackers_screen", "item":"complete_tracker"])
         }
         comletedTracker = !comletedTracker
         guard let tracker else { return }

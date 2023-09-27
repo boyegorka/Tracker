@@ -43,6 +43,7 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
     
     // MARK: - Private Properties
     private var alertPresenter: AlertPresenter = AlertPresenter()
+    private var analytics: AnalyticsService = AnalyticsService()
     
     private lazy var emptyScreenImage: UIImageView = {
         let imageView = UIImageView()
@@ -93,6 +94,16 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
         super.viewDidLoad()
         presenter?.updateCategories()
         setupTrackersScreen()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        analytics.report(event: "open", params: ["screen":"trackers_screen"])
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        analytics.report(event: "close", params: ["screen":"trackers_screen"])
     }
     
     // MARK: - Public Methods
@@ -192,6 +203,7 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
         vc.modalPresentationStyle = .formSheet
         let navigationController = UINavigationController(rootViewController: vc)
         self.present(navigationController, animated: true)
+        analytics.report(event: "click", params: ["screen":"trackers_screen", "item":"add_tracker"])
     }
     
     @objc
@@ -272,22 +284,19 @@ extension TrackersViewController: UICollectionViewDelegate {
                 print("edit button clicked")
             }
             let edit = UIAction(title: "edit".localized, image: UIImage(systemName: "square.and.pencil"), identifier: nil, discoverabilityTitle: nil, state: .off) { [weak self] (_) in
-                print("edit button clicked")
-                
-                self?.editTracker(indexPaths[0])
-                
+                guard let self = self else { return }
+                self.editTracker(indexPaths[0])
+                self.analytics.report(event: "click", params: ["screen":"trackers_screen", "item":"edit_tracker"])
             }
-            let delete = UIAction(title: "delete".localized, image: UIImage(systemName: "trash"), identifier: nil, discoverabilityTitle: nil, attributes: .destructive, state: .off) { (_) in
-                
-                print("delete button clicked")
+            let delete = UIAction(title: "delete".localized, image: UIImage(systemName: "trash"), identifier: nil, discoverabilityTitle: nil, attributes: .destructive, state: .off) { [weak self] (_) in
+                guard let self = self else { return }
                 
                 let viewModel = AlertModel(alertStyle: .actionSheet, title: "Уверены что хотите удалить трекер?", message: nil, buttonText: "Удалить") { [weak self] in
                     guard let self = self else { return }
-                    
                     self.presenter?.deleteTracker(indexPaths[0])
-                    
                 }
                 self.alertPresenter.show(result: viewModel)
+                self.analytics.report(event: "click", params: ["screen":"trackers_screen", "item":"delete_tracker"])
             }
             
             return UIMenu(title: "", image: nil, identifier: nil, options: UIMenu.Options.displayInline, children: [pin,edit,delete])

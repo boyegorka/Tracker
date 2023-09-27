@@ -9,6 +9,9 @@ import UIKit
 
 final class TabBarController: UITabBarController {
     
+    // MARK: - Private Properties
+    private var analytics: AnalyticsService = AnalyticsService()
+    
     // MARK: - View Life Cycles
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -24,12 +27,14 @@ final class TabBarController: UITabBarController {
         
         let trackers = UINavigationController(rootViewController: vc)
         trackers.tabBarItem = UITabBarItem(title: "trackers".localized, image: UIImage(systemName: "record.circle.fill"), selectedImage: nil)
+        analytics.report(event: "click", params: ["item":"open_trackers_screen"])
         return trackers
     }
     
     private func getStatisticViewController() -> UINavigationController {
         let statistic = UINavigationController(rootViewController: StatisticsViewController())
         statistic.tabBarItem = UITabBarItem(title: "statistics".localized, image: UIImage(systemName: "hare.fill"), selectedImage: nil)
+        analytics.report(event: "click", params: ["item":"open_statistics_screen"])
         return statistic
     }
 }

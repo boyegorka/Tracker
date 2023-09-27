@@ -17,6 +17,8 @@ final class TrackerTypeViewController: UIViewController, TrackerTypeViewControll
     var presenter: TrackerTypePresenterProtocol?
     
     // MARK: - Private Properties
+    private var analytics: AnalyticsService = AnalyticsService()
+    
     private lazy var newHabitButton: UIButton = {
         let newHabitButton = UIButton()
         newHabitButton.layer.cornerRadius = 16
@@ -85,6 +87,7 @@ final class TrackerTypeViewController: UIViewController, TrackerTypeViewControll
     private func pushNewHabitViewController(sender: UIButton) {
         dismiss(animated: true) {
             self.presenter?.selectType(.habit)
+            self.analytics.report(event: "click", params: ["screen":"trackers_type_screen", "item":"open_new_habit_screen"])
         }
     }
     
@@ -92,6 +95,7 @@ final class TrackerTypeViewController: UIViewController, TrackerTypeViewControll
     private func pushUnregularEventViewController(sender: UIButton) {
         dismiss(animated: true) {
             self.presenter?.selectType(.unregularEvent)
+            self.analytics.report(event: "click", params: ["screen":"trackers_type_screen", "item":"open_new_unregular_event_screen"])
         }
     }
 }
