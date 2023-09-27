@@ -1,0 +1,55 @@
+/* 
+  Localizable.strings
+  Tracker
+
+  Created by Егор Свистушкин on 18.09.2023.
+  
+*/
+
+// MARK: - Onboarding labels
+"onboarding.first.title" = "Track only what you want";
+"onboarding.second.title" = "Even if it's not liters of water and yoga";
+
+// MARK: - Pages titles
+"trackers" = "Trackers";
+"statistics" = "Statistics";
+"tracker.creation" = "Creating tracker";
+"new.habit" = "New habit";
+"new.unregular.event" = "New irregular event";
+"edit.habit" = "Editing habit";
+"edit.unregular.event" = "Editing irregular event";
+"new.category" = "New category";
+"category" = "Category";
+"schedule" = "Schedule";
+
+// MARK: - Empty screen labels
+"trackers.empty.screen.label" = "What are we tracking?";
+"nothing.found" = "Nothing found";
+"categories.empty.screen.label" = "Habits and events \n can be combined by meaning";
+"statistics.empty.screen.label" = "There's nothing to analyze yet";
+
+// MARK: - Button labels
+"habit.button" = "Habit";
+"unregular.event.button" = "Irregular event";
+"cancel.button" = "Cancel";
+"create.button" = "Create";
+"save.button" = "Save";
+"ready.button" = "Ready";
+"add.category.button" = "Add category";
+"onboarding.button" = "Now that's technology!";
+
+// MARK: - Textfield placeholders
+"tracker.name.placeholder" = "Enter the name of the tracker";
+"category.name.placeholder" = "Enter the name of the category";
+
+// MARK: - New tracker category titles
+"color" = "Color";
+"emoji" = "Emoji";
+
+// MARK: - New tracker timetable subtitle
+"timetable.subtitle" = "Every day";
+
+// MARK: - Context menu
+"pin" = "Pin";
+"edit" = "Edit";
+"delete" = "Delete";

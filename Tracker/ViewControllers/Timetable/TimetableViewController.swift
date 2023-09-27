@@ -60,12 +60,12 @@ final class TimetableViewController: UIViewController, TimetableViewControllerPr
         setupNavigationBar()
         addSubViews()
         contstraintSubviews()
-        readyButton.setTitle("Готово", for: .normal)
+        readyButton.setTitle("ready.button".localized, for: .normal)
     }
     
     private func setupNavigationBar() {
         if let navigationBar = navigationController?.navigationBar {
-            navigationBar.topItem?.title = "Расписание"
+            navigationBar.topItem?.title = "schedule".localized
         }
     }
     

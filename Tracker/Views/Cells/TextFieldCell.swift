@@ -21,6 +21,11 @@ final class TextFieldCell: UITableViewCell {
         set { textField.placeholder = newValue }
     }
     
+    var text: String? {
+        get { textField.text }
+        set { textField.text = newValue }
+    }
+    
     // MARK: - Private Properties
     private lazy var textField: UITextField = {
         let textField = UITextField()

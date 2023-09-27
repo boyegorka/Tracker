@@ -23,6 +23,15 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         }
     }
     
+    lazy var rectangleView: UIView = {
+        let rectangleView = UIView()
+        rectangleView.translatesAutoresizingMaskIntoConstraints = false
+        rectangleView.layer.cornerRadius = 16
+        rectangleView.layer.borderWidth = 1
+        rectangleView.layer.borderColor = UIColor.ypGray.withAlphaComponent(0.3).cgColor
+        return rectangleView
+    }()
+    
     // MARK: - Private Properties
     private var daysCounter: Int = 0 {
         didSet {
@@ -44,13 +53,6 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
             upadateButtonState()
         }
     }
-    
-    private lazy var rectangleView: UIView = {
-        let rectangleView = UIView()
-        rectangleView.translatesAutoresizingMaskIntoConstraints = false
-        rectangleView.layer.cornerRadius = 16
-        return rectangleView
-    }()
     
     private lazy var name: UILabel = {
         let name = UILabel()
@@ -158,7 +160,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     }
     
     private func updateCounterLabel() {
-        let daysLabelForCell = "\(daysCounter) дней"
+        let daysLabelForCell = daysCounter.localizeNumbers("NumberOfDays")
         days.text = daysLabelForCell
     }
     

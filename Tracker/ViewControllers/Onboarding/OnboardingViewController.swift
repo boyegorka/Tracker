@@ -10,8 +10,8 @@ import UIKit
 class OnboardingViewController: UIPageViewController {
     
     // MARK: - Private Properties
-    private var firstPage = OnboardingPage(text: "Отслеживайте только то, что хотите", image: UIImage(named: "OnboardingBackgroundFirst") ?? UIImage())
-    private var secondPage = OnboardingPage(text: "Даже если это не литры воды и йога", image: UIImage(named: "OnboardingBackgroundSecond") ?? UIImage())
+    private var firstPage = OnboardingPage(text: "onboarding.first.title".localized, image: UIImage(named: "OnboardingBackgroundFirst") ?? UIImage())
+    private var secondPage = OnboardingPage(text: "onboarding.second.title".localized, image: UIImage(named: "OnboardingBackgroundSecond") ?? UIImage())
     
     private lazy var pages: [UIViewController] = {
         return [firstPage, secondPage]

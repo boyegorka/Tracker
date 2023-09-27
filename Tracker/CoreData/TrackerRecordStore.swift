@@ -18,7 +18,6 @@ class TrackerRecordStore: NSObject {
     
     // MARK: - Private Properties
     private let context: NSManagedObjectContext
-    private let colorMarshalling = СolorMarshalling()
     private let scheduleConverter = ScheduleConverter()
     
     // MARK: - Initializers

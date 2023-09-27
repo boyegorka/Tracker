@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		CA154FEC2AB9180200FB8C61 /* Localizable.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = CA154FEE2AB9180200FB8C61 /* Localizable.stringsdict */; };
+		CA154FEF2AB9183500FB8C61 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = CA154FF12AB9183500FB8C61 /* Localizable.strings */; };
+		CA3A019A2ABCEEA4001C09B8 /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA3A01992ABCEEA4001C09B8 /* String+Extension.swift */; };
+		CA3A019C2ABD0FF6001C09B8 /* Int+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA3A019B2ABD0FF6001C09B8 /* Int+Extension.swift */; };
 		CA54B2AB2A69DE3D000E849B /* CollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA54B2AA2A69DE3D000E849B /* CollectionCell.swift */; };
 		CA54B2AD2A69EA12000E849B /* EmojisCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA54B2AC2A69EA12000E849B /* EmojisCollectionViewCell.swift */; };
 		CA54B2AF2A6C9543000E849B /* ColorsCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA54B2AE2A6C9543000E849B /* ColorsCollectionViewCell.swift */; };
@@ -27,6 +31,9 @@
 		CA6C91282A632B1600A4AE6D /* SupplementaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA6C91272A632B1600A4AE6D /* SupplementaryView.swift */; };
 		CA6C912A2A633B6200A4AE6D /* TimetablePresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA6C91292A633B6200A4AE6D /* TimetablePresenter.swift */; };
 		CA6C912C2A6353B400A4AE6D /* FormatterDays.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA6C912B2A6353B400A4AE6D /* FormatterDays.swift */; };
+		CA96CA1B2AC06705007BC31E /* AlertPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA96CA1A2AC06705007BC31E /* AlertPresenter.swift */; };
+		CA96CA1D2AC067AE007BC31E /* AlertModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA96CA1C2AC067AE007BC31E /* AlertModel.swift */; };
+		CA96CA1F2AC2530E007BC31E /* DaysCounterCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA96CA1E2AC2530E007BC31E /* DaysCounterCell.swift */; };
 		CA9838332A96E9130070B263 /* OnboardingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA9838322A96E9130070B263 /* OnboardingViewController.swift */; };
 		CA9838582A9823170070B263 /* OnboardingPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA9838572A9823170070B263 /* OnboardingPage.swift */; };
 		CA98385C2A9BD05B0070B263 /* CategoriesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA98385B2A9BD05B0070B263 /* CategoriesViewController.swift */; };
@@ -59,6 +66,12 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		CA154FF32AB9195400FB8C61 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
+		CA154FF42AB9195400FB8C61 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = ru; path = ru.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
+		CA3A01992ABCEEA4001C09B8 /* String+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Extension.swift"; sourceTree = "<group>"; };
+		CA3A019B2ABD0FF6001C09B8 /* Int+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Int+Extension.swift"; sourceTree = "<group>"; };
+		CA3A019D2ABE6CC6001C09B8 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		CA3A019E2ABE6CC6001C09B8 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = en; path = en.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
 		CA54B2AA2A69DE3D000E849B /* CollectionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionCell.swift; sourceTree = "<group>"; };
 		CA54B2AC2A69EA12000E849B /* EmojisCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmojisCollectionViewCell.swift; sourceTree = "<group>"; };
 		CA54B2AE2A6C9543000E849B /* ColorsCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorsCollectionViewCell.swift; sourceTree = "<group>"; };
@@ -79,6 +92,9 @@
 		CA6C91272A632B1600A4AE6D /* SupplementaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupplementaryView.swift; sourceTree = "<group>"; };
 		CA6C91292A633B6200A4AE6D /* TimetablePresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimetablePresenter.swift; sourceTree = "<group>"; };
 		CA6C912B2A6353B400A4AE6D /* FormatterDays.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormatterDays.swift; sourceTree = "<group>"; };
+		CA96CA1A2AC06705007BC31E /* AlertPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertPresenter.swift; sourceTree = "<group>"; };
+		CA96CA1C2AC067AE007BC31E /* AlertModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertModel.swift; sourceTree = "<group>"; };
+		CA96CA1E2AC2530E007BC31E /* DaysCounterCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DaysCounterCell.swift; sourceTree = "<group>"; };
 		CA9838322A96E9130070B263 /* OnboardingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingViewController.swift; sourceTree = "<group>"; };
 		CA9838572A9823170070B263 /* OnboardingPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingPage.swift; sourceTree = "<group>"; };
 		CA98385B2A9BD05B0070B263 /* CategoriesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriesViewController.swift; sourceTree = "<group>"; };
@@ -123,6 +139,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		CA154FF22AB918C000FB8C61 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				CA154FF12AB9183500FB8C61 /* Localizable.strings */,
+				CA154FEE2AB9180200FB8C61 /* Localizable.stringsdict */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
 		CA54B2E82A754E65000E849B /* CoreData */ = {
 			isa = PBXGroup;
 			children = (
@@ -131,6 +156,7 @@
 				CA54B2EB2A754EAB000E849B /* TrackerCategoryStore.swift */,
 				CA54B2EF2A754F15000E849B /* Model.xcdatamodeld */,
 				CACDE4A82A817B67003021AE /* NSManagedObjectSubclass */,
+				CA154FF22AB918C000FB8C61 /* Resources */,
 			);
 			path = CoreData;
 			sourceTree = "<group>";
@@ -179,6 +205,8 @@
 				CA6C912B2A6353B400A4AE6D /* FormatterDays.swift */,
 				CA54B2F52A78769F000E849B /* СolorMarshalling.swift */,
 				CA54B2FD2A7F262A000E849B /* ScheduleFormatter.swift */,
+				CA3A01992ABCEEA4001C09B8 /* String+Extension.swift */,
+				CA3A019B2ABD0FF6001C09B8 /* Int+Extension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -206,6 +234,7 @@
 			isa = PBXGroup;
 			children = (
 				CAA8CC522A3CD28300AE4AD3 /* TabBarController.swift */,
+				CA96CA1A2AC06705007BC31E /* AlertPresenter.swift */,
 				CAA8CC502A3CCD3300AE4AD3 /* Trackers */,
 				CAA8CC572A3D3A2600AE4AD3 /* Statistics */,
 				CAA8CC542A3D379400AE4AD3 /* TrackerType */,
@@ -255,6 +284,7 @@
 		CAAB0CCF2A547ABE00EBC766 /* Cells */ = {
 			isa = PBXGroup;
 			children = (
+				CA96CA1E2AC2530E007BC31E /* DaysCounterCell.swift */,
 				CAAB0CD12A547B3200EBC766 /* TextFieldCell.swift */,
 				CAAB0CD32A54953F00EBC766 /* TableViewCell.swift */,
 				CA54B2AA2A69DE3D000E849B /* CollectionCell.swift */,
@@ -281,6 +311,7 @@
 				CABC08632A4C7D2F008CC2E4 /* TrackerCategoryModel.swift */,
 				CABC08652A4C7DE6008CC2E4 /* TrackerRecordModel.swift */,
 				CA6B25742A5C9FCD00388BBF /* TrackerType.swift */,
+				CA96CA1C2AC067AE007BC31E /* AlertModel.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -385,11 +416,12 @@
 			};
 			buildConfigurationList = CAC6C7B12A1F1AE700E9ACC3 /* Build configuration list for PBXProject "Tracker" */;
 			compatibilityVersion = "Xcode 14.0";
-			developmentRegion = en;
+			developmentRegion = ru;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				en,
 				Base,
+				ru,
+				en,
 			);
 			mainGroup = CAC6C7AD2A1F1AE700E9ACC3;
 			productRefGroup = CAC6C7B72A1F1AE700E9ACC3 /* Products */;
@@ -407,6 +439,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				CAC6C7C32A1F1AE900E9ACC3 /* Assets.xcassets in Resources */,
+				CA154FEF2AB9183500FB8C61 /* Localizable.strings in Resources */,
+				CA154FEC2AB9180200FB8C61 /* Localizable.stringsdict in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -428,11 +462,13 @@
 				CADB92492AA4E32D00CC6294 /* CategoriesViewModel.swift in Sources */,
 				CA6B256D2A5C547F00388BBF /* UIViewController+Extension.swift in Sources */,
 				CADB924F2AA7B19700CC6294 /* NewCategoryViewController.swift in Sources */,
+				CA96CA1B2AC06705007BC31E /* AlertPresenter.swift in Sources */,
 				CA54B2AF2A6C9543000E849B /* ColorsCollectionViewCell.swift in Sources */,
 				CACDE4A22A817A7A003021AE /* TrackerRecordCoreData+CoreDataClass.swift in Sources */,
 				CA6B256F2A5C76CC00388BBF /* TrackersPresenter.swift in Sources */,
 				CAC6C7BC2A1F1AE700E9ACC3 /* SceneDelegate.swift in Sources */,
 				CA6C912C2A6353B400A4AE6D /* FormatterDays.swift in Sources */,
+				CA96CA1F2AC2530E007BC31E /* DaysCounterCell.swift in Sources */,
 				CA9838582A9823170070B263 /* OnboardingPage.swift in Sources */,
 				CACDE4A52A817A7A003021AE /* TrackerCoreData+CoreDataProperties.swift in Sources */,
 				CACDE4A72A817A7A003021AE /* TrackerCategoryCoreData+CoreDataProperties.swift in Sources */,
@@ -446,14 +482,17 @@
 				CA54B2EA2A754E89000E849B /* TrackerStore.swift in Sources */,
 				CA6C91282A632B1600A4AE6D /* SupplementaryView.swift in Sources */,
 				CA6B25732A5C9DD900388BBF /* TrackerTypePresenter.swift in Sources */,
+				CA3A019A2ABCEEA4001C09B8 /* String+Extension.swift in Sources */,
 				CADB924B2AA5CAD500CC6294 /* ObservablePropertyWrapper.swift in Sources */,
 				CAA8CC532A3CD28300AE4AD3 /* TabBarController.swift in Sources */,
 				CA9838332A96E9130070B263 /* OnboardingViewController.swift in Sources */,
 				CA54B2F62A78769F000E849B /* СolorMarshalling.swift in Sources */,
 				CABC085A2A47428C008CC2E4 /* TrackerCollectionViewCell.swift in Sources */,
+				CA3A019C2ABD0FF6001C09B8 /* Int+Extension.swift in Sources */,
 				CA54B2FE2A7F262A000E849B /* ScheduleFormatter.swift in Sources */,
 				CA54B2F12A754F15000E849B /* Model.xcdatamodeld in Sources */,
 				CAAB0CCB2A4F9B9D00EBC766 /* TimetableViewController.swift in Sources */,
+				CA96CA1D2AC067AE007BC31E /* AlertModel.swift in Sources */,
 				CAA8CC4D2A3CCB4800AE4AD3 /* UIColor+Extension.swift in Sources */,
 				CA6C912A2A633B6200A4AE6D /* TimetablePresenter.swift in Sources */,
 				CA5C51AB2A698DFA0078C7E8 /* TrackerCellViewModel.swift in Sources */,
@@ -470,11 +509,33 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXVariantGroup section */
+		CA154FEE2AB9180200FB8C61 /* Localizable.stringsdict */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CA154FF42AB9195400FB8C61 /* ru */,
+				CA3A019E2ABE6CC6001C09B8 /* en */,
+			);
+			name = Localizable.stringsdict;
+			sourceTree = "<group>";
+		};
+		CA154FF12AB9183500FB8C61 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CA154FF32AB9195400FB8C61 /* ru */,
+				CA3A019D2ABE6CC6001C09B8 /* en */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
 /* Begin XCBuildConfiguration section */
 		CAC6C7C82A1F1AE900E9ACC3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -535,6 +596,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -604,7 +666,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.boyegorka.Tracker;
+				PRODUCT_BUNDLE_IDENTIFIER = com.boyegorka;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -634,7 +696,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.boyegorka.Tracker;
+				PRODUCT_BUNDLE_IDENTIFIER = com.boyegorka;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;

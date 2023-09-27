@@ -14,9 +14,11 @@ protocol TrackersPresenterProtocol {
     var search: String { get set }
     var isEmpty: Bool { get }
     func addTracker(_ tracker: Tracker, at category: String)
+    func saveTracker(_ tracker: Tracker, at category: String)
+    func deleteTracker(_ indexPath: IndexPath)
     func numberOfSections() -> Int?
     func numberOfItemsInSection(section: Int) -> Int
-    func titleInSection(section: Int) -> String
+    func categoryName(section: Int) -> String
     func updateCategories()
     func completeTracker(_ complete: Bool, tracker: Tracker)
     func trackerViewModel(at indexPath: IndexPath) -> TrackerCellViewModel?
@@ -63,6 +65,22 @@ final class TrackersPresenter: TrackersPresenterProtocol {
         }
     }
     
+    func saveTracker(_ tracker: Tracker, at category: String) {
+        do {
+            try service.saveTracker(tracker, at: category)
+        } catch {
+            print(error)
+        }
+    }
+    
+    func deleteTracker(_ indexPath: IndexPath) {
+        do {
+            try service.deleteTracker(at: indexPath)
+        } catch {
+            print(error)
+        }
+    }
+    
     func updateCategories() {
         service.fetch(search: search, date: currentDate)
         view?.updateView()
@@ -96,7 +114,7 @@ final class TrackersPresenter: TrackersPresenterProtocol {
         service.getTrackersNumber(tracker: tracker)
     }
     
-    func titleInSection(section: Int) -> String {
+    func categoryName(section: Int) -> String {
         service.categoryName(at: section)
     }
     
@@ -123,15 +141,17 @@ extension TrackersPresenter: TrackerServiceDelegate {
 
         let count = view.trackersCollectionView.numberOfSections
         let newSections: IndexSet = IndexSet(update.insertedIndexes.filter({$0.section >= count}).map { $0.section })
+        let toDeleteSections: IndexSet = IndexSet(update.deletedIndexes.filter({$0.section <= count}).map { $0.section })
 
 
         view.trackersCollectionView.performBatchUpdates {
 
             view.trackersCollectionView.insertSections(newSections)
+            view.trackersCollectionView.deleteSections(toDeleteSections)
 
             view.trackersCollectionView.insertItems(at: update.insertedIndexes)
             view.trackersCollectionView.deleteItems(at: update.deletedIndexes)
-            
+            view.trackersCollectionView.reloadItems(at: update.updatedIndexes)
         }
     }
 }

@@ -34,9 +34,16 @@ final class CollectionCell: UITableViewCell {
     // MARK: - Public Properties
     weak var delegate: CollectionCellDelegate?
     
+    var selectedIndex: Int? {
+        didSet {
+            guard let selectedIndex else { return }
+            collectionView.selectItem(at: IndexPath.init(row: selectedIndex, section: 0), animated: true, scrollPosition: .centeredVertically)
+        }
+    }
+    
     var type: CollectionCellType = .emoji(items: []) {
         didSet {
-            emojisCollectionView.reloadData()
+            collectionView.reloadData()
             updateSize()
         }
     }
@@ -49,7 +56,7 @@ final class CollectionCell: UITableViewCell {
         return size - CGFloat(Contstants.cellCountInline)
     }
     
-    private lazy var emojisCollectionView: ResizableCollectionView = {
+    private lazy var collectionView: ResizableCollectionView = {
         let collectionView = ResizableCollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
         
         collectionView.translatesAutoresizingMaskIntoConstraints = false
@@ -84,7 +91,7 @@ final class CollectionCell: UITableViewCell {
     
     // MARK: - Private Methods
     private func updateSize() {
-        emojisCollectionView.layoutIfNeeded()
+        collectionView.layoutIfNeeded()
     }
     
     private func setupSubviews() {
@@ -95,15 +102,15 @@ final class CollectionCell: UITableViewCell {
     }
     
     private func addSubviews() {
-        contentView.addSubview(emojisCollectionView)
+        contentView.addSubview(collectionView)
     }
     
     private func constraintSubviews() {
         NSLayoutConstraint.activate([
-            emojisCollectionView.topAnchor.constraint(equalTo: contentView.topAnchor),
-            emojisCollectionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
-            emojisCollectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            emojisCollectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            collectionView.topAnchor.constraint(equalTo: contentView.topAnchor),
+            collectionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+            collectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            collectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
         ])
     }
 }
@@ -146,9 +153,9 @@ extension CollectionCell: UICollectionViewDelegate {
         switch type {
             
         case .emoji:
-            view.title.text = "Emoji"
+            view.title.text = "emoji".localized
         case .color:
-            view.title.text = "Цвет"
+            view.title.text = "color".localized
         }
         return view
     }

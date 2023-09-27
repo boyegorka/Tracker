@@ -59,13 +59,13 @@ final class TrackerTypeViewController: UIViewController, TrackerTypeViewControll
         view.backgroundColor = .ypWhite
         setupNavigationBar()
         addSubViews()
-        newHabitButton.setTitle("Привычка", for: .normal)
-        newUnregularEventButton.setTitle("Нерегулярное событие", for: .normal)
+        newHabitButton.setTitle("habit.button".localized, for: .normal)
+        newUnregularEventButton.setTitle("unregular.event.button".localized, for: .normal)
     }
     
     private func setupNavigationBar() {
         if let navigationBar = navigationController?.navigationBar {
-            navigationBar.topItem?.title = "Создание трекера"
+            navigationBar.topItem?.title = "tracker.creation".localized
         }
     }
     

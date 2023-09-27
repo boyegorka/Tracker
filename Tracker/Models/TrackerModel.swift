@@ -14,3 +14,9 @@ struct Tracker {
     let emoji: String
     let schedule: [Int]
 }
+
+extension Tracker {
+    var type: TrackerType {
+        schedule.isEmpty ? .unregularEvent : .habit
+    }
+}

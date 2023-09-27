@@ -11,6 +11,7 @@ import CoreData
 struct TrackerServiceUpdate {
     let insertedIndexes: [IndexPath]
     let deletedIndexes: [IndexPath]
+    let updatedIndexes: [IndexPath]
 }
 
 protocol TrackerServiceDelegate: AnyObject {
@@ -38,6 +39,7 @@ final class TrackerService: NSObject {
     
     private var insertedIndexes: [IndexPath] = []
     private var deletedIndexes: [IndexPath] = []
+    private var updatedIndexes: [IndexPath] = []
     
     private lazy var persistentContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: "Model")
@@ -136,11 +138,17 @@ extension TrackerService: TrackerServiceProtocol {
         }
     }
     
-    func deleteTracker(at indexPath: IndexPath) throws {
-        // let traker = fetchedResultsController.object(at: indexPath)
-        // try? trackerStore.delete(traker)
+    func saveTracker(_ tracker: Tracker, at category: String) throws {
+        if let categoryCoreData = trackerCategoryStore?.getCategoryWithName(category) {
+            try? trackerStore?.saveTracker(tracker, at: categoryCoreData)
+        }
     }
     
+    func deleteTracker(at indexPath: IndexPath) throws {
+        if let traker = fetchedResultsController?.object(at: indexPath) {
+            try? trackerStore?.deleteTracker(traker)
+        }
+    }
 }
 
 // MARK: - NSFetchedResultsControllerDelegate
@@ -150,21 +158,25 @@ extension TrackerService: NSFetchedResultsControllerDelegate {
     func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         insertedIndexes = []
         deletedIndexes = []
+        updatedIndexes = []
     }
     
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
         let insert = insertedIndexes
         let delete = deletedIndexes
+        let update = updatedIndexes
         DispatchQueue.main.async {
             self.delegate?.didUpdate(TrackerServiceUpdate(
                 insertedIndexes: insert,
-                deletedIndexes: delete
+                deletedIndexes: delete,
+                updatedIndexes: update
             )
             )
         }
         
         insertedIndexes = []
         deletedIndexes = []
+        updatedIndexes = []
     }
     
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
@@ -178,6 +190,11 @@ extension TrackerService: NSFetchedResultsControllerDelegate {
             if let indexPath = newIndexPath {
                 print(indexPath)
                 insertedIndexes.append(indexPath)
+            }
+        case .update:
+            if let indexPath = indexPath {
+                print(indexPath)
+                updatedIndexes.append(indexPath)
             }
         default:
             break

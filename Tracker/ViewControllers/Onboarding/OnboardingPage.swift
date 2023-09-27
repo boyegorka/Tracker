@@ -42,7 +42,7 @@ class OnboardingPage: UIViewController {
         button.overrideUserInterfaceStyle = .light
         button.layer.cornerRadius = 16
         button.backgroundColor = .ypBlack
-        button.setTitle("Вот это технологии!", for: .normal)
+        button.setTitle("onboarding.button".localized, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.setTitleColor(.ypWhite, for: .normal)
         button.addTarget(self, action: #selector(buttonAction), for: .touchUpInside)

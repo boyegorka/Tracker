@@ -42,7 +42,7 @@ class StatisticsViewController: UIViewController {
     // MARK: - Private Methods
     private func setupStatisticsScreen() {
         emptyScreenImage.image = UIImage(named: "EmptyScreenSmileCrying")
-        emptyScreenText.text = "Анализировать пока нечего"
+        emptyScreenText.text = "statistics.empty.screen.label".localized
         view.backgroundColor = .ypWhite
         setupNavigationBar()
     }
@@ -50,7 +50,7 @@ class StatisticsViewController: UIViewController {
     private func setupNavigationBar() {
         if let navigationBar = navigationController?.navigationBar {
             
-            navigationBar.topItem?.title = "Статистика"
+            navigationBar.topItem?.title = "statistics".localized
             navigationBar.prefersLargeTitles = true
             navigationBar.topItem?.largeTitleDisplayMode = .always
             
