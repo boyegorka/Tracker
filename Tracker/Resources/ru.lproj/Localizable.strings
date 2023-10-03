@@ -28,6 +28,9 @@
 "categories.empty.screen.label" = "Привычки и события \n можно объединить по смыслу";
 "statistics.empty.screen.label" = "Анализировать пока нечего";
 
+// MARK: - Statistics screen labels
+"completed.trackers" = "Трекеров завершено";
+
 // MARK: - Button labels
 "habit.button" = "Привычка";
 "unregular.event.button" = "Нерегулярное событие";
@@ -46,10 +49,14 @@
 "color" = "Цвет";
 "emoji" = "Emoji";
 
-// MARK: - New tracker timetable subtitle
+// MARK: - Tracker timetable subtitle
 "timetable.subtitle" = "Каждый день";
 
 // MARK: - Context menu
 "pin" = "Закрепить";
+"unpin" = "Открепить";
 "edit" = "Редактировать";
 "delete" = "Удалить";
+
+// MARK: - Trackers section titles
+"pinned" = "Закреплённые";

@@ -30,7 +30,8 @@ class TrackerStore: NSObject {
                        name: trackerCoreData.name,
                        color: UIColor.color(from: trackerCoreData.color),
                        emoji: trackerCoreData.emoji,
-                       schedule: scheduleConverter.convertToArray(string: trackerCoreData.schedule)
+                       schedule: scheduleConverter.convertToArray(string: trackerCoreData.schedule),
+                       isPinned: trackerCoreData.isPinned
         )
     }
     
@@ -45,6 +46,13 @@ class TrackerStore: NSObject {
         if let trackerCoreData = getTrackerWithID(tracker.id) {
             updateTracker(trackerCoreData, tracker)
             trackerCoreData.category = category
+            try context.save()
+        }
+    }
+
+    func pin(_ isPinned: Bool, tracker: Tracker) throws {
+        if let trackerCoreData = getTrackerWithID(tracker.id) {
+            trackerCoreData.isPinned = isPinned
             try context.save()
         }
     }
@@ -68,5 +76,6 @@ class TrackerStore: NSObject {
         trackerCoreData.color = tracker.color.hexString
         trackerCoreData.emoji = tracker.emoji
         trackerCoreData.schedule = scheduleConverter.convertToString(array: tracker.schedule)
+        trackerCoreData.isPinned = tracker.isPinned
     }
 }

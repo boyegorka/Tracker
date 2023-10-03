@@ -93,6 +93,7 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
     override func viewDidLoad() {
         super.viewDidLoad()
         presenter?.updateCategories()
+        presenter?.updatePinned()
         setupTrackersScreen()
     }
     
@@ -182,12 +183,16 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
         self.present(navigationController, animated: true)
     }
     
-    private func editTracker(_ indexPath: IndexPath) {
+    private func editTracker(_ tracker: Tracker, indexPath: IndexPath) {
         guard let viewModel = presenter?.trackerViewModel(at: indexPath),
               let category = presenter?.categoryName(section: indexPath.section)
         else { return }
-        let state = NewTrackerPresenter.ScreenState.edit(tracker: viewModel.tracker, category: category, daysCounter: viewModel.daysCounter)
+        let state = NewTrackerPresenter.ScreenState.edit(tracker: tracker, category: category, daysCounter: viewModel.daysCounter)
         showNewTracker(state: state, type: viewModel.tracker.type)
+    }
+
+    private func pinTracker(_ tracker: Tracker) {
+        presenter?.pinTracker(tracker: tracker)
     }
     
     @objc
@@ -274,21 +279,33 @@ extension TrackersViewController: UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemsAt indexPaths: [IndexPath], point: CGPoint) -> UIContextMenuConfiguration? {
         
-        if indexPaths == [] {
-            return nil
-        }
+        guard !indexPaths.isEmpty,
+              let tracker = presenter?.trackerViewModel(at: indexPaths[0])?.tracker else { return nil }
         
         let context = UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { (action) -> UIMenu? in
             
-            let pin = UIAction(title: "pin".localized, image: UIImage(systemName: "pin"), identifier: nil, discoverabilityTitle: nil, state: .off) { (_) in
-                print("edit button clicked")
-            }
-            let edit = UIAction(title: "edit".localized, image: UIImage(systemName: "square.and.pencil"), identifier: nil, discoverabilityTitle: nil, state: .off) { [weak self] (_) in
+            let pin = UIAction(title: tracker.isPinned ? "unpin".localized : "pin".localized,
+                               image: UIImage(systemName: "pin"),
+                               identifier: nil,
+                               discoverabilityTitle: nil,
+                               state: .off) { [weak self] (_) in
                 guard let self = self else { return }
-                self.editTracker(indexPaths[0])
-                self.analytics.report(event: "click", params: ["screen":"trackers_screen", "item":"edit_tracker"])
+                self.pinTracker(tracker)
             }
-            let delete = UIAction(title: "delete".localized, image: UIImage(systemName: "trash"), identifier: nil, discoverabilityTitle: nil, attributes: .destructive, state: .off) { [weak self] (_) in
+            let edit = UIAction(title: "edit".localized,
+                                image: UIImage(systemName: "square.and.pencil"),
+                                identifier: nil,
+                                discoverabilityTitle: nil,
+                                state: .off) { [weak self] (_) in
+                guard let self = self else { return }
+                self.editTracker(tracker, indexPath: indexPaths[0])
+            }
+            let delete = UIAction(title: "delete".localized,
+                                  image: UIImage(systemName: "trash"),
+                                  identifier: nil,
+                                  discoverabilityTitle: nil,
+                                  attributes: .destructive,
+                                  state: .off) { [weak self] (_) in
                 guard let self = self else { return }
                 
                 let viewModel = AlertModel(alertStyle: .actionSheet, title: "Уверены что хотите удалить трекер?", message: nil, buttonText: "Удалить") { [weak self] in
@@ -296,7 +313,6 @@ extension TrackersViewController: UICollectionViewDelegate {
                     self.presenter?.deleteTracker(indexPaths[0])
                 }
                 self.alertPresenter.show(result: viewModel)
-                self.analytics.report(event: "click", params: ["screen":"trackers_screen", "item":"delete_tracker"])
             }
             
             return UIMenu(title: "", image: nil, identifier: nil, options: UIMenu.Options.displayInline, children: [pin,edit,delete])

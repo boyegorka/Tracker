@@ -57,6 +57,18 @@ class TrackerRecordStore: NSObject {
         return count
     }
     
+    func getAllTrackersRecordNumber() -> Int {
+        var count = 0
+        let request = NSFetchRequest<TrackerRecordCoreData>(entityName: "TrackerRecordCoreData")
+        request.resultType = .countResultType
+        do {
+            count = try context.count(for: request)
+        } catch let error as NSError {
+            print("Error fetching tracker record number: \(error.localizedDescription)")
+        }
+        return count
+    }
+    
     func addNewTrackerRecord(_ tracker: Tracker, date: Date) throws {
         let newTrackerRecord = TrackerRecordCoreData(context: context)
         guard let date = date.onlyDate else { return }

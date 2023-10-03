@@ -43,10 +43,13 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     
     private var tracker: Tracker? {
         didSet {
-            name.text = tracker?.name
-            emoji.text = tracker?.emoji
-            rectangleView.backgroundColor = tracker?.color
-            counterButton.backgroundColor = tracker?.color
+            guard let tracker else { return }
+            
+            name.text = tracker.name
+            emoji.text = tracker.emoji
+            rectangleView.backgroundColor = tracker.color
+            counterButton.backgroundColor = tracker.color
+            pinImage.isHidden = !tracker.isPinned
         }
     }
     
@@ -81,6 +84,15 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         return emoji
     }()
     
+    private lazy var pinImage: UIImageView = {
+        let image = UIImageView()
+        image.translatesAutoresizingMaskIntoConstraints = false
+        image.image = UIImage(named: "Pin")
+        image.tintColor = .ypWhite
+        image.isHidden = true
+        return image
+    }()
+    
     private lazy var days: UILabel = {
         let days = UILabel()
         days.translatesAutoresizingMaskIntoConstraints = false
@@ -113,6 +125,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         contentView.addSubview(rectangleView)
         rectangleView.addSubview(name)
         rectangleView.addSubview(emojiBackground)
+        rectangleView.addSubview(pinImage)
         emojiBackground.addSubview(emoji)
         contentView.addSubview(days)
         contentView.addSubview(counterButton)
@@ -137,6 +150,11 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
             
             emoji.centerXAnchor.constraint(equalTo: emojiBackground.centerXAnchor),
             emoji.centerYAnchor.constraint(equalTo: emojiBackground.centerYAnchor),
+            
+            pinImage.topAnchor.constraint(equalTo: rectangleView.topAnchor, constant: 18),
+            pinImage.bottomAnchor.constraint(lessThanOrEqualTo: name.topAnchor, constant: 18),
+            pinImage.leadingAnchor.constraint(greaterThanOrEqualTo: emojiBackground.trailingAnchor, constant: 12),
+            pinImage.trailingAnchor.constraint(equalTo: rectangleView.trailingAnchor, constant: -12),
             
             days.topAnchor.constraint(equalTo: rectangleView.bottomAnchor, constant: 16),
             days.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 12),

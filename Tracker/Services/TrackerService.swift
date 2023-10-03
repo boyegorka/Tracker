@@ -12,10 +12,11 @@ struct TrackerServiceUpdate {
     let insertedIndexes: [IndexPath]
     let deletedIndexes: [IndexPath]
     let updatedIndexes: [IndexPath]
+    let movedIndexes: [(from: IndexPath, to: IndexPath)]
 }
 
 protocol TrackerServiceDelegate: AnyObject {
-    func didUpdate(_ update: TrackerServiceUpdate)
+    func didUpdate()
 }
 
 protocol TrackerServiceProtocol {
@@ -40,6 +41,8 @@ final class TrackerService: NSObject {
     private var insertedIndexes: [IndexPath] = []
     private var deletedIndexes: [IndexPath] = []
     private var updatedIndexes: [IndexPath] = []
+    private var movedIndexes: [(from: IndexPath, to: IndexPath)] = []
+
     
     private lazy var persistentContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: "Model")
@@ -51,8 +54,9 @@ final class TrackerService: NSObject {
         return container
     }()
     
-    private var fetchedResultsController: NSFetchedResultsController<TrackerCoreData>?
-    
+    private var fetchedResultsController: NSFetchedResultsController<TrackerCoreData>?    
+    private var fetchedPinnedResultsController: NSFetchedResultsController<TrackerCoreData>?
+
     // MARK: - Initializers
     override init() {
         super.init()
@@ -62,6 +66,20 @@ final class TrackerService: NSObject {
     }
     
     // MARK: - Public Methods
+    func fetchPinned() {
+        let fetchRequest = TrackerCoreData.fetchRequest()
+        fetchRequest.sortDescriptors = [
+            NSSortDescriptor(keyPath: \TrackerCoreData.name, ascending: true)
+        ]
+
+        fetchRequest.predicate = NSPredicate(format: "%K == true", #keyPath(TrackerCoreData.isPinned))
+
+        let fetchedController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: persistentContainer.viewContext, sectionNameKeyPath: nil, cacheName: nil)
+        fetchedController.delegate = self
+        fetchedPinnedResultsController = fetchedController
+        try? fetchedController.performFetch()
+    }
+    
     func fetch(search: String, date: Date) {
 
         let fetchRequest = TrackerCoreData.fetchRequest()
@@ -74,10 +92,12 @@ final class TrackerService: NSObject {
 
         let datePredicate = NSPredicate(format: "%K CONTAINS[cd] %@ OR %K == ''", #keyPath(TrackerCoreData.schedule), weekday, #keyPath(TrackerCoreData.schedule))
 
+        let pinnedPredicate = NSPredicate(format: "%K == false", #keyPath(TrackerCoreData.isPinned))
+
         if search.count != 0 {
-            fetchRequest.predicate = NSCompoundPredicate(type: .and, subpredicates: [namePredicate, datePredicate])
+            fetchRequest.predicate = NSCompoundPredicate(type: .and, subpredicates: [namePredicate, datePredicate, pinnedPredicate])
         } else {
-            fetchRequest.predicate = datePredicate
+            fetchRequest.predicate = NSCompoundPredicate(type: .and, subpredicates: [datePredicate, pinnedPredicate])
         }
 
         let fetchedController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: persistentContainer.viewContext, sectionNameKeyPath: #keyPath(TrackerCoreData.category.name), cacheName: nil)
@@ -102,6 +122,10 @@ final class TrackerService: NSObject {
         trackerRecordStore?.getTrackerRecordsNumber(tracker: tracker) ?? 0
     }
     
+    func getAllTrackersRecordNumber() -> Int {
+        trackerRecordStore?.getAllTrackersRecordNumber() ?? 0
+    }
+    
     func addToCompletedTrackers(tracker: Tracker, date: Date) throws {
         try trackerRecordStore?.addNewTrackerRecord(tracker, date: date)
     }
@@ -115,21 +139,48 @@ final class TrackerService: NSObject {
 
 extension TrackerService: TrackerServiceProtocol {
     
+    private var hasPinned: Bool {
+        // возвращает результат, если в закреплённой секции больше одной ячейки
+        (fetchedPinnedResultsController?.sections?[0].numberOfObjects ?? 0) > 0
+    }
+
+    private func indexFetchSection(_ section: Int) -> Int {
+        return hasPinned ? section - 1 : section
+    }
+
+    private func isPinnedSection(_ section: Int) -> Bool {
+        return section == 0 && hasPinned
+    }
+    
     var numberOfSections: Int {
-        fetchedResultsController?.sections?.count ?? 0
+        let count = fetchedResultsController?.sections?.count ?? 0
+        return hasPinned ? count + 1 : count
     }
     
     func numberOfRowsInSection(_ section: Int) -> Int {
-        fetchedResultsController?.sections?[section].numberOfObjects ?? 0
+        if isPinnedSection(section) {
+            return fetchedPinnedResultsController?.sections?[section].numberOfObjects ?? 0
+        }
+        return fetchedResultsController?.sections?[indexFetchSection(section)].numberOfObjects ?? 0
     }
     
     func tracker(at indexPath: IndexPath) -> Tracker? {
-        guard let fetchedResultsController else { return nil}
-        return trackerStore?.getTrackerFromCoreData(from: fetchedResultsController.object(at: indexPath))
+        if isPinnedSection(indexPath.section) {
+            guard let fetchedPinnedResultsController else { return nil }
+            return trackerStore?.getTrackerFromCoreData(from: fetchedPinnedResultsController.object(at: indexPath))
+        }
+        guard let fetchedResultsController else { return nil }
+        let newIndexPath = IndexPath(row: indexPath.row, section: indexFetchSection(indexPath.section))
+        return trackerStore?.getTrackerFromCoreData(from: fetchedResultsController.object(at: newIndexPath))
     }
     
     func categoryName(at section: Int) -> String {
-        fetchedResultsController?.object(at: IndexPath(item: 0, section: section)).category.name ?? ""
+        if isPinnedSection(section) {
+            return "pinned".localized
+        } else {
+            let newIndexPath = IndexPath(row: 0, section: indexFetchSection(section))
+            return fetchedResultsController?.object(at: newIndexPath).category.name ?? ""
+        }
     }
     
     func addTracker(_ traker: Tracker, at category: String) throws {
@@ -149,55 +200,18 @@ extension TrackerService: TrackerServiceProtocol {
             try? trackerStore?.deleteTracker(traker)
         }
     }
+
+    func pin(_ isPinned: Bool, tracker: Tracker) throws {
+        try? trackerStore?.pin(isPinned, tracker: tracker)
+    }
 }
 
 // MARK: - NSFetchedResultsControllerDelegate
 
 extension TrackerService: NSFetchedResultsControllerDelegate {
-    
-    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        insertedIndexes = []
-        deletedIndexes = []
-        updatedIndexes = []
-    }
-    
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        let insert = insertedIndexes
-        let delete = deletedIndexes
-        let update = updatedIndexes
         DispatchQueue.main.async {
-            self.delegate?.didUpdate(TrackerServiceUpdate(
-                insertedIndexes: insert,
-                deletedIndexes: delete,
-                updatedIndexes: update
-            )
-            )
-        }
-        
-        insertedIndexes = []
-        deletedIndexes = []
-        updatedIndexes = []
-    }
-    
-    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-        
-        switch type {
-        case .delete:
-            if let indexPath = indexPath {
-                deletedIndexes.append(indexPath)
-            }
-        case .insert:
-            if let indexPath = newIndexPath {
-                print(indexPath)
-                insertedIndexes.append(indexPath)
-            }
-        case .update:
-            if let indexPath = indexPath {
-                print(indexPath)
-                updatedIndexes.append(indexPath)
-            }
-        default:
-            break
+            self.delegate?.didUpdate()
         }
     }
 }

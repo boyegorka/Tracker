@@ -21,6 +21,7 @@ protocol NewTrackerPresenterProtocol {
     var color: UIColor? { get set }
     var pageTitle: String { get }
     var daysCounter: Int? { get }
+    var isPinned: Bool? { get }
     func saveTracker()
 }
 
@@ -43,6 +44,7 @@ final class NewTrackerPresenter: NewTrackerPresenterProtocol {
     var trackerId: UUID = UUID()
     var daysCounter: Int?
     var trackerName: String?
+    var isPinned: Bool?
     var subtitleForCategory: String = ""
     var selectedCategory: String?
     var emoji: String?
@@ -100,6 +102,7 @@ final class NewTrackerPresenter: NewTrackerPresenterProtocol {
             self.emoji = tracker.emoji
             self.selectedCategory = category
             self.daysCounter = daysCounter
+            self.isPinned = tracker.isPinned
         }
     }
     
@@ -110,7 +113,7 @@ final class NewTrackerPresenter: NewTrackerPresenterProtocol {
               let emoji,
               let color
         else { return }
-        let newTracker = Tracker(id: trackerId, name: name, color: color, emoji: emoji, schedule: schedule)
+        let newTracker = Tracker(id: trackerId, name: name, color: color, emoji: emoji, schedule: schedule, isPinned: false)
         switch state {
         case .new:
             delegate?.didCreateTracker(newTracker, at: selectedCategory)

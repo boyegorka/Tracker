@@ -15,11 +15,13 @@ protocol TrackersPresenterProtocol {
     var isEmpty: Bool { get }
     func addTracker(_ tracker: Tracker, at category: String)
     func saveTracker(_ tracker: Tracker, at category: String)
+    func pinTracker(tracker: Tracker)
     func deleteTracker(_ indexPath: IndexPath)
     func numberOfSections() -> Int?
     func numberOfItemsInSection(section: Int) -> Int
     func categoryName(section: Int) -> String
     func updateCategories()
+    func updatePinned()
     func completeTracker(_ complete: Bool, tracker: Tracker)
     func trackerViewModel(at indexPath: IndexPath) -> TrackerCellViewModel?
 }
@@ -86,17 +88,28 @@ final class TrackersPresenter: TrackersPresenterProtocol {
         view?.updateView()
     }
     
+    func updatePinned() {
+        service.fetchPinned()
+    }
+
+    func pinTracker(tracker: Tracker) {
+        do {
+            try service.pin(!tracker.isPinned, tracker: tracker)
+        } catch {
+            print(error)
+        }
+    }
+    
     func completeTracker(_ complete: Bool, tracker: Tracker) {
-        
-            do {
-                if complete {
-                    try service.addToCompletedTrackers(tracker: tracker, date: currentDate)
-                } else {
-                    try service.removeFromCompletedTrackers(tracker: tracker, date: currentDate)
-                }
-            } catch {
-                print(error.localizedDescription)
+        do {
+            if complete {
+                try service.addToCompletedTrackers(tracker: tracker, date: currentDate)
+            } else {
+                try service.removeFromCompletedTrackers(tracker: tracker, date: currentDate)
             }
+        } catch {
+            print(error.localizedDescription)
+        }
     }
     
     func isCompletedTracker(_ tracker: Tracker) -> Bool {
@@ -136,22 +149,9 @@ final class TrackersPresenter: TrackersPresenterProtocol {
 // MARK: - TrackerServiceDelegate
 extension TrackersPresenter: TrackerServiceDelegate {
     
-    func didUpdate(_ update: TrackerServiceUpdate) {
+    func didUpdate() {
         guard let view else { return }
-
-        let count = view.trackersCollectionView.numberOfSections
-        let newSections: IndexSet = IndexSet(update.insertedIndexes.filter({$0.section >= count}).map { $0.section })
-        let toDeleteSections: IndexSet = IndexSet(update.deletedIndexes.filter({$0.section <= count}).map { $0.section })
-
-
-        view.trackersCollectionView.performBatchUpdates {
-
-            view.trackersCollectionView.insertSections(newSections)
-            view.trackersCollectionView.deleteSections(toDeleteSections)
-
-            view.trackersCollectionView.insertItems(at: update.insertedIndexes)
-            view.trackersCollectionView.deleteItems(at: update.deletedIndexes)
-            view.trackersCollectionView.reloadItems(at: update.updatedIndexes)
-        }
+        view.trackersCollectionView.reloadData()
+//        не смог с помощью performBatchUpdates сделать обновление таблицы, всё снёс, теперь reloadData
     }
 }

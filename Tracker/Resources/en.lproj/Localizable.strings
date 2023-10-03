@@ -28,6 +28,9 @@
 "categories.empty.screen.label" = "Habits and events \n can be combined by meaning";
 "statistics.empty.screen.label" = "There's nothing to analyze yet";
 
+// MARK: - Statistics screen labels
+"completed.trackers" = "Trackers completed";
+
 // MARK: - Button labels
 "habit.button" = "Habit";
 "unregular.event.button" = "Irregular event";
@@ -46,10 +49,14 @@
 "color" = "Color";
 "emoji" = "Emoji";
 
-// MARK: - New tracker timetable subtitle
+// MARK: - Tracker timetable subtitle
 "timetable.subtitle" = "Every day";
 
 // MARK: - Context menu
 "pin" = "Pin";
+"unpin" = "Unpin";
 "edit" = "Edit";
 "delete" = "Delete";
+
+// MARK: - Trackers section titles
+"pinned" = "Pinned";

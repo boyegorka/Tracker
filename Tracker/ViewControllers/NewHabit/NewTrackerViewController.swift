@@ -108,7 +108,6 @@ final class NewTrackerViewController: UIViewController, NewTrackerViewController
     override func viewDidLoad() {
         super.viewDidLoad()
         setupNewHabitScreen()
-        tableView.reloadData()
     }
     
     // MARK: - Private Methods
@@ -268,9 +267,9 @@ extension NewTrackerViewController: TimetableDelegate {
     func didSelect(weekdays: [Int]) {
         presenter?.schedule = weekdays
         updateButtonState()
-        let section = Section.planning
-        if let row = rowsForSection(section).firstIndex(of: Section.Row.schedule) {
-            tableView.reloadRows(at: [IndexPath(row: row, section: section.rawValue)], with: .none)
+        if let section = sections.firstIndex(of: Section.planning),
+           let row = rowsForSection(Section.planning).firstIndex(of: Section.Row.schedule) {
+            tableView.reloadRows(at: [IndexPath(row: row, section: section)], with: .none)
         }
     }
 }
@@ -280,9 +279,9 @@ extension NewTrackerViewController: CategoriesDelegate {
     func didSelectCategory(_ name: String) {
         presenter?.selectedCategory = name
         updateButtonState()
-        let section = Section.planning
-        if let row = rowsForSection(section).firstIndex(of: Section.Row.category) {
-            tableView.reloadRows(at: [IndexPath(row: row, section: section.rawValue)], with: .none)
+        if let section = sections.firstIndex(of: Section.planning),
+           let row = rowsForSection(Section.planning).firstIndex(of: Section.Row.category) {
+            tableView.reloadRows(at: [IndexPath(row: row, section: section)], with: .none)
         }
     }
 }
