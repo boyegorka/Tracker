@@ -18,7 +18,7 @@ protocol CategoriesViewControllerProtocol: AnyObject {
 final class CategoriesViewController: UIViewController, CategoriesViewControllerProtocol {
     
     // MARK: - Enums
-    enum Contstant {
+    private enum Contstant {
         static let categoryCellIdentifier = "CategoryCell"
     }
     

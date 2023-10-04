@@ -14,7 +14,7 @@ protocol NewTrackerViewControllerProtocol: AnyObject {
 final class NewTrackerViewController: UIViewController, NewTrackerViewControllerProtocol {
     
     // MARK: - Enums
-    enum Constant {
+    private enum Constant {
         static let daysCounterIdentifier = "daysCounter"
         static let textFieldCellIdentifier = "TextFieldCell"
         static let planningCellIdentifier = "PlaningCell"
@@ -362,11 +362,9 @@ extension NewTrackerViewController: UITableViewDelegate {
         switch rowsForSection(sections[indexPath.section])[indexPath.row] {
         case .daysCounter:
             switch presenter?.state {
-            case .new:
-                return 0
             case .edit:
                 return 50
-            case nil:
+            default:
                 return 0
             }
         case .textField, .category, .schedule:

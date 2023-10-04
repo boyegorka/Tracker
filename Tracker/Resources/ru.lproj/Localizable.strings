@@ -40,6 +40,7 @@
 "ready.button" = "Готово";
 "add.category.button" = "Добавить категорию";
 "onboarding.button" = "Вот это технологии!";
+"filters" = "Фильтры";
 
 // MARK: - Textfield placeholders
 "tracker.name.placeholder" = "Введите название трекера";

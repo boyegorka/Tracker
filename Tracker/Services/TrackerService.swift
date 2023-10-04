@@ -25,7 +25,7 @@ protocol TrackerServiceProtocol {
     func tracker(at: IndexPath) -> Tracker?
     func categoryName(at section: Int) -> String
     func addTracker(_ traker: Tracker, at category: String) throws
-    func deleteTracker(at indexPath: IndexPath) throws
+    func deleteTracker(_ tracker: Tracker) throws
 }
 
 final class TrackerService: NSObject {
@@ -195,10 +195,8 @@ extension TrackerService: TrackerServiceProtocol {
         }
     }
     
-    func deleteTracker(at indexPath: IndexPath) throws {
-        if let traker = fetchedResultsController?.object(at: indexPath) {
-            try? trackerStore?.deleteTracker(traker)
-        }
+    func deleteTracker(_ tracker: Tracker) throws {
+        try? trackerStore?.deleteTracker(tracker)
     }
 
     func pin(_ isPinned: Bool, tracker: Tracker) throws {

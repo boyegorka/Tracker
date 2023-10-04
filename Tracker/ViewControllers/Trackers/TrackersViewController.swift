@@ -16,7 +16,7 @@ protocol TrackersViewControllerProtocol: AnyObject {
 
 final class TrackersViewController: UIViewController, TrackersViewControllerProtocol {
     
-    enum Contstants {
+    private enum Contstants {
         static let cellIdentifier = "TrackerCell"
         static let headerIdentifier = "TrackersHeader"
         static let contentInsets: CGFloat = 16
@@ -30,7 +30,7 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
         
         collectionView.translatesAutoresizingMaskIntoConstraints = false
-        collectionView.backgroundColor = .ypWhite
+        collectionView.backgroundColor = .clear
         collectionView.showsVerticalScrollIndicator = false
         collectionView.dataSource = self
         collectionView.delegate = self
@@ -299,6 +299,7 @@ extension TrackersViewController: UICollectionViewDelegate {
                                 state: .off) { [weak self] (_) in
                 guard let self = self else { return }
                 self.editTracker(tracker, indexPath: indexPaths[0])
+                analytics.report(event: "click", params: ["screen":"trackers_screen", "item":"edit_tracker"])
             }
             let delete = UIAction(title: "delete".localized,
                                   image: UIImage(systemName: "trash"),
@@ -310,9 +311,10 @@ extension TrackersViewController: UICollectionViewDelegate {
                 
                 let viewModel = AlertModel(alertStyle: .actionSheet, title: "Уверены что хотите удалить трекер?", message: nil, buttonText: "Удалить") { [weak self] in
                     guard let self = self else { return }
-                    self.presenter?.deleteTracker(indexPaths[0])
+                    self.presenter?.deleteTracker(tracker)
                 }
                 self.alertPresenter.show(result: viewModel)
+                analytics.report(event: "click", params: ["screen":"trackers_screen", "item":"delete_tracker"])
             }
             
             return UIMenu(title: "", image: nil, identifier: nil, options: UIMenu.Options.displayInline, children: [pin,edit,delete])

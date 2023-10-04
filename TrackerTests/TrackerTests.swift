@@ -14,6 +14,9 @@ final class TrackerTests: XCTestCase {
     func testTrackerViewControllerDark() {
         let vc = TrackersViewController()
         
+        //vc.view.backgroundColor = .blue - тест фона
+        
+        isRecording = false
         assertSnapshot(matching: vc, as: .image(traits: .init(userInterfaceStyle: .light)))
         assertSnapshot(matching: vc, as: .image(traits: .init(userInterfaceStyle: .dark)))
         

@@ -24,10 +24,8 @@ final class TabBarController: UITabBarController {
         let presenter = TrackersPresenter()
         presenter.view = vc
         vc.presenter = presenter
-        
         let trackers = UINavigationController(rootViewController: vc)
         trackers.tabBarItem = UITabBarItem(title: "trackers".localized, image: UIImage(systemName: "record.circle.fill"), selectedImage: nil)
-        analytics.report(event: "click", params: ["item":"open_trackers_screen"])
         return trackers
     }
     
@@ -36,10 +34,8 @@ final class TabBarController: UITabBarController {
         let presenter = StatisticsPresenter()
         presenter.view = vc
         vc.presenter = presenter
-
         let statistic = UINavigationController(rootViewController: vc)
         statistic.tabBarItem = UITabBarItem(title: "statistics".localized, image: UIImage(systemName: "hare.fill"), selectedImage: nil)
-        analytics.report(event: "click", params: ["item":"open_statistics_screen"])
         return statistic
     }
 }

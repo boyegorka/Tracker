@@ -7,14 +7,14 @@
 
 import UIKit
 
-protocol CNewCategoryViewControllerProtocol: AnyObject {
+protocol NewCategoryViewControllerProtocol: AnyObject {
     var viewModel: NewCategoryViewModelProtocol { get }
 }
 
-final class NewCategoryViewController: UIViewController {
+final class NewCategoryViewController: UIViewController, NewCategoryViewControllerProtocol {
     
     // MARK: - Public Properties
-    private var viewModel: NewCategoryViewModelProtocol
+    var viewModel: NewCategoryViewModelProtocol
     
     // MARK: - Private Properties
     private lazy var newCategoryNameTextField: UITextField = {

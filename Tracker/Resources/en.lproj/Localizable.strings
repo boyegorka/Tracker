@@ -40,6 +40,7 @@
 "ready.button" = "Ready";
 "add.category.button" = "Add category";
 "onboarding.button" = "Now that's technology!";
+"filters" = "Filters";
 
 // MARK: - Textfield placeholders
 "tracker.name.placeholder" = "Enter the name of the tracker";

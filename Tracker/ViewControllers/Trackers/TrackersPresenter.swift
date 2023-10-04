@@ -16,7 +16,7 @@ protocol TrackersPresenterProtocol {
     func addTracker(_ tracker: Tracker, at category: String)
     func saveTracker(_ tracker: Tracker, at category: String)
     func pinTracker(tracker: Tracker)
-    func deleteTracker(_ indexPath: IndexPath)
+    func deleteTracker(_ tacker: Tracker)
     func numberOfSections() -> Int?
     func numberOfItemsInSection(section: Int) -> Int
     func categoryName(section: Int) -> String
@@ -75,9 +75,9 @@ final class TrackersPresenter: TrackersPresenterProtocol {
         }
     }
     
-    func deleteTracker(_ indexPath: IndexPath) {
+    func deleteTracker(_ tracker: Tracker) {
         do {
-            try service.deleteTracker(at: indexPath)
+            try service.deleteTracker(tracker)
         } catch {
             print(error)
         }
@@ -152,6 +152,5 @@ extension TrackersPresenter: TrackerServiceDelegate {
     func didUpdate() {
         guard let view else { return }
         view.trackersCollectionView.reloadData()
-//        не смог с помощью performBatchUpdates сделать обновление таблицы, всё снёс, теперь reloadData
     }
 }

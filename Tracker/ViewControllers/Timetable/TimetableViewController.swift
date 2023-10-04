@@ -14,7 +14,7 @@ protocol TimetableViewControllerProtocol: AnyObject {
 final class TimetableViewController: UIViewController, TimetableViewControllerProtocol {
     
     // MARK: - Enums
-    enum Contstant {
+    private enum Contstant {
         static let timetableCellIdentifier = "TimetableCell"
     }
     

@@ -20,7 +20,7 @@ final class CollectionCell: UITableViewCell {
         case color(items: [UIColor?])
     }
     
-    enum Contstants {
+    private enum Contstants {
         static let colorCellIdentifier = "ColorsCollectionViewCell"
         static let emojiCellIdentifier = "EmojisCollectionViewCell"
         static let headerIdentifier = "EmojisCellHeader"
@@ -37,7 +37,11 @@ final class CollectionCell: UITableViewCell {
     var selectedIndex: Int? {
         didSet {
             guard let selectedIndex else { return }
-            collectionView.selectItem(at: IndexPath.init(row: selectedIndex, section: 0), animated: true, scrollPosition: .centeredVertically)
+            collectionView.selectItem(
+                at: IndexPath.init(row: selectedIndex, section: 0),
+                animated: true,
+                scrollPosition: .centeredVertically
+            )
         }
     }
     

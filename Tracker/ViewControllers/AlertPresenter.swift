@@ -20,9 +20,7 @@ final class AlertPresenter {
         let action = UIAlertAction(title: result.buttonText, style: .destructive) {_ in
             result.completion()
         }
-        let cancel = UIAlertAction(title: "Отменить", style: .cancel) { _ in
-            
-        }
+        let cancel = UIAlertAction(title: "Отменить", style: .cancel, handler: nil)
         alert.addAction(action)
         alert.addAction(cancel)
         viewController?.present(alert, animated: true, completion: nil)

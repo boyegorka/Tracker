@@ -15,11 +15,11 @@ protocol StatisticsViewControllerProtocol: AnyObject {
 final class StatisticsViewController: UIViewController, StatisticsViewControllerProtocol {
     
     // MARK: - Enums
-    enum Contstant {
+    private enum Contstant {
         static let statisticsCellIdentifier = "statisticsCell"
     }
     
-    enum StatisticsType: Int, CaseIterable {
+    private enum StatisticsType: Int, CaseIterable {
         case completedTrackers
     }
     
@@ -27,12 +27,14 @@ final class StatisticsViewController: UIViewController, StatisticsViewController
     var presenter: StatisticsPresenterProtocol?
     
     // MARK: - Private Properties
+    private var analytics: AnalyticsService = AnalyticsService()
+
     private lazy var statisticsTableView: UITableView = {
         var tableView = UITableView(frame: .zero, style: .insetGrouped)
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.separatorStyle = .none
         tableView.contentInsetAdjustmentBehavior = .never
-        tableView.backgroundColor = .ypWhite
+        tableView.backgroundColor = .clear
         tableView.isScrollEnabled = true
         tableView.dataSource = self
         tableView.delegate = self
@@ -83,12 +85,24 @@ final class StatisticsViewController: UIViewController, StatisticsViewController
         setupScreen()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        analytics.report(event: "open", params: ["screen":"statistics_screen"])
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        analytics.report(event: "close", params: ["screen":"statistics_screen"])
+    }
+    
     // MARK: - Public Methods
     func setupEmptyScreen() {
-        let isEmpty = !noStats() && statsAreZero()
-        emptyScreenView.isHidden = !isEmpty
-        statisticsTableView.isHidden = isEmpty
-    }
+            let emptyStats = StatisticsType.allCases.count <= 0
+            let zeroStats = presenter?.completedTrackerCount == 0
+            let isEmpty = !emptyStats && zeroStats
+            emptyScreenView.isHidden = !isEmpty
+            statisticsTableView.isHidden = isEmpty
+        }
     
     // MARK: - Private Methods
     private func setupNavigationBar() {
@@ -108,20 +122,6 @@ final class StatisticsViewController: UIViewController, StatisticsViewController
         presenter?.getAllTrackersStat()
     }
     
-    private func statsAreZero() -> Bool {
-        if presenter?.completedTrackerCount == 0 {
-            return true
-        }
-        return false
-    }
-    
-    private func noStats() -> Bool {
-        if StatisticsType.allCases.count > 0 {
-            return false
-        }
-        return true
-    }
-    
     private func addSubviews() {
         view.addSubview(statisticsTableView)
         view.addSubview(emptyScreenView)
@@ -139,7 +139,6 @@ final class StatisticsViewController: UIViewController, StatisticsViewController
             emptyScreenView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             emptyScreenView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             emptyScreenView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            
         ])
     }
     
@@ -179,9 +178,8 @@ extension StatisticsViewController: UITableViewDelegate {
     }
 }
 
-extension StatisticsViewController:UITabBarControllerDelegate {
+extension StatisticsViewController: UITabBarControllerDelegate {
     func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
         presenter?.getAllTrackersStat()
-        statisticsTableView.reloadData()
     }
 }

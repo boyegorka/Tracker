@@ -64,9 +64,11 @@ class TrackerStore: NSObject {
         return try? context.fetch(request).first
     }
     
-    func deleteTracker(_ tracker: TrackerCoreData) throws {
-        context.delete(tracker)
-        try context.save()
+    func deleteTracker(_ tracker: Tracker) throws {
+        if let trackerCoreData = getTrackerWithID(tracker.id) {
+            context.delete(trackerCoreData)
+            try context.save()
+        }
     }
     
     // MARK: - Private Methods
