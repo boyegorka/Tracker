@@ -13,6 +13,7 @@ protocol TrackersPresenterProtocol {
     var caregories: [String] { get }
     var search: String { get set }
     var isEmpty: Bool { get }
+    var selectedFilter: String? { get set }
     func addTracker(_ tracker: Tracker, at category: String)
     func saveTracker(_ tracker: Tracker, at category: String)
     func pinTracker(tracker: Tracker)
@@ -47,6 +48,8 @@ final class TrackersPresenter: TrackersPresenterProtocol {
     var isEmpty: Bool {
         service.numberOfSections == 0
     }
+    
+    var selectedFilter: String?
     
     weak var view: TrackersViewControllerProtocol?
     

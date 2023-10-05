@@ -193,13 +193,11 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     
     @objc
     private func checkForToday() {
-        // track тут
         if comletedTracker {
             daysCounter -= 1
-            analytics.report(event: "click", params: ["screen":"trackers_screen", "item":"uncomplete_tracker"])
         } else {
             daysCounter += 1
-            analytics.report(event: "click", params: ["screen":"trackers_screen", "item":"complete_tracker"])
+            analytics.report(event: "click", params: ["screen":"trackers_screen", "item":"track"])
         }
         comletedTracker = !comletedTracker
         guard let tracker else { return }

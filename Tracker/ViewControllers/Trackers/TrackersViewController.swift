@@ -89,6 +89,18 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
         return dateButton
     }()
     
+    private lazy var filtersButton: UIButton = {
+        let button = UIButton()
+        button.setTitle("filters".localized, for: .normal)
+        button.layer.cornerRadius = 16
+        button.backgroundColor = .ypBlue
+        button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
+        button.setTitleColor(.ypWhite, for: .normal)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(pushFiltersViewController), for: .touchUpInside)
+        return button
+    }()
+    
     // MARK: - View Life Cycles
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -115,6 +127,7 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
         emptyScreenText.text = isSearch ? "trackers.empty.screen.label".localized : "nothing.found".localized
         emptyScreenView.isHidden = !isEmpty
         trackersCollectionView.isHidden = isEmpty
+        filtersButton.isHidden = isEmpty
     }
     
     func updateView() {
@@ -151,6 +164,7 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
     private func addSubviews() {
         view.addSubview(trackersCollectionView)
         view.addSubview(emptyScreenView)
+        view.addSubview(filtersButton)
     }
     
     private func contstraintSubviews() {
@@ -164,6 +178,12 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
             emptyScreenView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             emptyScreenView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             emptyScreenView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            
+            filtersButton.heightAnchor.constraint(equalToConstant: 50),
+            filtersButton.widthAnchor.constraint(equalToConstant: 114),
+            filtersButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            filtersButton.topAnchor.constraint(greaterThanOrEqualTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
+            filtersButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
         ])
     }
     
@@ -190,9 +210,24 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
         let state = NewTrackerPresenter.ScreenState.edit(tracker: tracker, category: category, daysCounter: viewModel.daysCounter)
         showNewTracker(state: state, type: viewModel.tracker.type)
     }
-
+    
     private func pinTracker(_ tracker: Tracker) {
         presenter?.pinTracker(tracker: tracker)
+    }
+    
+    @objc
+    private func pushFiltersViewController() {
+        let vc = FiltersViewController()
+        let presenter = FiltersPresenter(selectedFilter: presenter?.selectedFilter, delegate: self)
+        
+        vc.presenter = presenter
+        presenter.view = vc
+        
+        vc.modalTransitionStyle = .coverVertical
+        vc.modalPresentationStyle = .formSheet
+        let navigationController = UINavigationController(rootViewController: vc)
+        self.present(navigationController, animated: true)
+        analytics.report(event: "click", params: ["screen":"trackers_screen", "item":"filters"])
     }
     
     @objc
@@ -208,7 +243,7 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
         vc.modalPresentationStyle = .formSheet
         let navigationController = UINavigationController(rootViewController: vc)
         self.present(navigationController, animated: true)
-        analytics.report(event: "click", params: ["screen":"trackers_screen", "item":"add_tracker"])
+        analytics.report(event: "click", params: ["screen":"trackers_screen", "item":"add_track"])
     }
     
     @objc
@@ -299,7 +334,7 @@ extension TrackersViewController: UICollectionViewDelegate {
                                 state: .off) { [weak self] (_) in
                 guard let self = self else { return }
                 self.editTracker(tracker, indexPath: indexPaths[0])
-                analytics.report(event: "click", params: ["screen":"trackers_screen", "item":"edit_tracker"])
+                analytics.report(event: "click", params: ["screen":"trackers_screen", "item":"edit"])
             }
             let delete = UIAction(title: "delete".localized,
                                   image: UIImage(systemName: "trash"),
@@ -314,7 +349,7 @@ extension TrackersViewController: UICollectionViewDelegate {
                     self.presenter?.deleteTracker(tracker)
                 }
                 self.alertPresenter.show(result: viewModel)
-                analytics.report(event: "click", params: ["screen":"trackers_screen", "item":"delete_tracker"])
+                analytics.report(event: "click", params: ["screen":"trackers_screen", "item":"delete"])
             }
             
             return UIMenu(title: "", image: nil, identifier: nil, options: UIMenu.Options.displayInline, children: [pin,edit,delete])
@@ -362,5 +397,11 @@ extension TrackersViewController: UISearchBarDelegate {
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         presenter?.search = ""
+    }
+}
+
+extension TrackersViewController: FiltersDelegate {
+    func didSelectFilter(_ name: String) {
+        presenter?.selectedFilter = name
     }
 }

@@ -87,6 +87,7 @@ final class StatisticsViewController: UIViewController, StatisticsViewController
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        statisticsTableView.reloadData()
         analytics.report(event: "open", params: ["screen":"statistics_screen"])
     }
     
