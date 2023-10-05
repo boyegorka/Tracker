@@ -13,11 +13,16 @@ protocol TrackersPresenterProtocol {
     var caregories: [String] { get }
     var search: String { get set }
     var isEmpty: Bool { get }
+    var selectedFilter: String? { get set }
     func addTracker(_ tracker: Tracker, at category: String)
+    func saveTracker(_ tracker: Tracker, at category: String)
+    func pinTracker(tracker: Tracker)
+    func deleteTracker(_ tacker: Tracker)
     func numberOfSections() -> Int?
     func numberOfItemsInSection(section: Int) -> Int
-    func titleInSection(section: Int) -> String
+    func categoryName(section: Int) -> String
     func updateCategories()
+    func updatePinned()
     func completeTracker(_ complete: Bool, tracker: Tracker)
     func trackerViewModel(at indexPath: IndexPath) -> TrackerCellViewModel?
 }
@@ -44,6 +49,8 @@ final class TrackersPresenter: TrackersPresenterProtocol {
         service.numberOfSections == 0
     }
     
+    var selectedFilter: String?
+    
     weak var view: TrackersViewControllerProtocol?
     
     // MARK: - Private Properties
@@ -63,22 +70,49 @@ final class TrackersPresenter: TrackersPresenterProtocol {
         }
     }
     
+    func saveTracker(_ tracker: Tracker, at category: String) {
+        do {
+            try service.saveTracker(tracker, at: category)
+        } catch {
+            print(error)
+        }
+    }
+    
+    func deleteTracker(_ tracker: Tracker) {
+        do {
+            try service.deleteTracker(tracker)
+        } catch {
+            print(error)
+        }
+    }
+    
     func updateCategories() {
         service.fetch(search: search, date: currentDate)
         view?.updateView()
     }
     
+    func updatePinned() {
+        service.fetchPinned()
+    }
+
+    func pinTracker(tracker: Tracker) {
+        do {
+            try service.pin(!tracker.isPinned, tracker: tracker)
+        } catch {
+            print(error)
+        }
+    }
+    
     func completeTracker(_ complete: Bool, tracker: Tracker) {
-        
-            do {
-                if complete {
-                    try service.addToCompletedTrackers(tracker: tracker, date: currentDate)
-                } else {
-                    try service.removeFromCompletedTrackers(tracker: tracker, date: currentDate)
-                }
-            } catch {
-                print(error.localizedDescription)
+        do {
+            if complete {
+                try service.addToCompletedTrackers(tracker: tracker, date: currentDate)
+            } else {
+                try service.removeFromCompletedTrackers(tracker: tracker, date: currentDate)
             }
+        } catch {
+            print(error.localizedDescription)
+        }
     }
     
     func isCompletedTracker(_ tracker: Tracker) -> Bool {
@@ -96,7 +130,7 @@ final class TrackersPresenter: TrackersPresenterProtocol {
         service.getTrackersNumber(tracker: tracker)
     }
     
-    func titleInSection(section: Int) -> String {
+    func categoryName(section: Int) -> String {
         service.categoryName(at: section)
     }
     
@@ -118,20 +152,8 @@ final class TrackersPresenter: TrackersPresenterProtocol {
 // MARK: - TrackerServiceDelegate
 extension TrackersPresenter: TrackerServiceDelegate {
     
-    func didUpdate(_ update: TrackerServiceUpdate) {
+    func didUpdate() {
         guard let view else { return }
-
-        let count = view.trackersCollectionView.numberOfSections
-        let newSections: IndexSet = IndexSet(update.insertedIndexes.filter({$0.section >= count}).map { $0.section })
-
-
-        view.trackersCollectionView.performBatchUpdates {
-
-            view.trackersCollectionView.insertSections(newSections)
-
-            view.trackersCollectionView.insertItems(at: update.insertedIndexes)
-            view.trackersCollectionView.deleteItems(at: update.deletedIndexes)
-            
-        }
+        view.trackersCollectionView.reloadData()
     }
 }

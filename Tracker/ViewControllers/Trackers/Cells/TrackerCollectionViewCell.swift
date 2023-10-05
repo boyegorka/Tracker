@@ -23,7 +23,18 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         }
     }
     
+    lazy var rectangleView: UIView = {
+        let rectangleView = UIView()
+        rectangleView.translatesAutoresizingMaskIntoConstraints = false
+        rectangleView.layer.cornerRadius = 16
+        rectangleView.layer.borderWidth = 1
+        rectangleView.layer.borderColor = UIColor.ypGray.withAlphaComponent(0.3).cgColor
+        return rectangleView
+    }()
+    
     // MARK: - Private Properties
+    private var analytics: AnalyticsService = AnalyticsService()
+    
     private var daysCounter: Int = 0 {
         didSet {
             updateCounterLabel()
@@ -32,10 +43,13 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     
     private var tracker: Tracker? {
         didSet {
-            name.text = tracker?.name
-            emoji.text = tracker?.emoji
-            rectangleView.backgroundColor = tracker?.color
-            counterButton.backgroundColor = tracker?.color
+            guard let tracker else { return }
+            
+            name.text = tracker.name
+            emoji.text = tracker.emoji
+            rectangleView.backgroundColor = tracker.color
+            counterButton.backgroundColor = tracker.color
+            pinImage.isHidden = !tracker.isPinned
         }
     }
     
@@ -44,13 +58,6 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
             upadateButtonState()
         }
     }
-    
-    private lazy var rectangleView: UIView = {
-        let rectangleView = UIView()
-        rectangleView.translatesAutoresizingMaskIntoConstraints = false
-        rectangleView.layer.cornerRadius = 16
-        return rectangleView
-    }()
     
     private lazy var name: UILabel = {
         let name = UILabel()
@@ -75,6 +82,15 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         emoji.font = .systemFont(ofSize: 16)
         
         return emoji
+    }()
+    
+    private lazy var pinImage: UIImageView = {
+        let image = UIImageView()
+        image.translatesAutoresizingMaskIntoConstraints = false
+        image.image = UIImage(named: "Pin")
+        image.tintColor = .ypWhite
+        image.isHidden = true
+        return image
     }()
     
     private lazy var days: UILabel = {
@@ -109,6 +125,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         contentView.addSubview(rectangleView)
         rectangleView.addSubview(name)
         rectangleView.addSubview(emojiBackground)
+        rectangleView.addSubview(pinImage)
         emojiBackground.addSubview(emoji)
         contentView.addSubview(days)
         contentView.addSubview(counterButton)
@@ -134,6 +151,11 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
             emoji.centerXAnchor.constraint(equalTo: emojiBackground.centerXAnchor),
             emoji.centerYAnchor.constraint(equalTo: emojiBackground.centerYAnchor),
             
+            pinImage.topAnchor.constraint(equalTo: rectangleView.topAnchor, constant: 18),
+            pinImage.bottomAnchor.constraint(lessThanOrEqualTo: name.topAnchor, constant: 18),
+            pinImage.leadingAnchor.constraint(greaterThanOrEqualTo: emojiBackground.trailingAnchor, constant: 12),
+            pinImage.trailingAnchor.constraint(equalTo: rectangleView.trailingAnchor, constant: -12),
+            
             days.topAnchor.constraint(equalTo: rectangleView.bottomAnchor, constant: 16),
             days.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 12),
             
@@ -158,7 +180,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     }
     
     private func updateCounterLabel() {
-        let daysLabelForCell = "\(daysCounter) дней"
+        let daysLabelForCell = daysCounter.localizeNumbers("NumberOfDays")
         days.text = daysLabelForCell
     }
     
@@ -175,6 +197,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
             daysCounter -= 1
         } else {
             daysCounter += 1
+            analytics.report(event: "click", params: ["screen":"trackers_screen", "item":"track"])
         }
         comletedTracker = !comletedTracker
         guard let tracker else { return }

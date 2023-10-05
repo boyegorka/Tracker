@@ -18,7 +18,6 @@ class TrackerRecordStore: NSObject {
     
     // MARK: - Private Properties
     private let context: NSManagedObjectContext
-    private let colorMarshalling = СolorMarshalling()
     private let scheduleConverter = ScheduleConverter()
     
     // MARK: - Initializers
@@ -50,6 +49,18 @@ class TrackerRecordStore: NSObject {
         request.resultType = .countResultType
         let idPredicate = NSPredicate(format: "%K == %@", #keyPath(TrackerRecordCoreData.tracker.trackerId), tracker.id.uuidString)
         request.predicate = idPredicate
+        do {
+            count = try context.count(for: request)
+        } catch let error as NSError {
+            print("Error fetching tracker record number: \(error.localizedDescription)")
+        }
+        return count
+    }
+    
+    func getAllTrackersRecordNumber() -> Int {
+        var count = 0
+        let request = NSFetchRequest<TrackerRecordCoreData>(entityName: "TrackerRecordCoreData")
+        request.resultType = .countResultType
         do {
             count = try context.count(for: request)
         } catch let error as NSError {

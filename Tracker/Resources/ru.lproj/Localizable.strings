@@ -1,0 +1,63 @@
+/* 
+  Localizable.strings
+  Tracker
+
+  Created by Егор Свистушкин on 18.09.2023.
+  
+*/
+
+// MARK: - Onboarding labels
+"onboarding.first.title" = "Отслеживайте только то, что хотите";
+"onboarding.second.title" = "Даже если это не литры воды и йога";
+
+// MARK: - Pages titles
+"trackers" = "Трекеры";
+"statistics" = "Статистика";
+"tracker.creation" = "Создание трекера";
+"new.habit" = "Новая привычка";
+"new.unregular.event" = "Новое нерегулярное событие";
+"edit.habit" = "Редактирование привычки";
+"edit.unregular.event" = "Редактирование нерегулярного события";
+"new.category" = "Новая категория";
+"category" = "Категория";
+"schedule" = "Расписание";
+
+// MARK: - Empty screen labels
+"trackers.empty.screen.label" = "Что будем отслеживать?";
+"nothing.found" = "Ничего не найдено";
+"categories.empty.screen.label" = "Привычки и события \n можно объединить по смыслу";
+"statistics.empty.screen.label" = "Анализировать пока нечего";
+
+// MARK: - Statistics screen labels
+"completed.trackers" = "Трекеров завершено";
+
+// MARK: - Button labels
+"habit.button" = "Привычка";
+"unregular.event.button" = "Нерегулярное событие";
+"cancel.button" = "Отменить";
+"create.button" = "Создать";
+"save.button" = "Сохранить";
+"ready.button" = "Готово";
+"add.category.button" = "Добавить категорию";
+"onboarding.button" = "Вот это технологии!";
+"filters" = "Фильтры";
+
+// MARK: - Textfield placeholders
+"tracker.name.placeholder" = "Введите название трекера";
+"category.name.placeholder" = "Введите название категории";
+
+// MARK: - New tracker category titles
+"color" = "Цвет";
+"emoji" = "Emoji";
+
+// MARK: - Tracker timetable subtitle
+"timetable.subtitle" = "Каждый день";
+
+// MARK: - Context menu
+"pin" = "Закрепить";
+"unpin" = "Открепить";
+"edit" = "Редактировать";
+"delete" = "Удалить";
+
+// MARK: - Trackers section titles
+"pinned" = "Закреплённые";

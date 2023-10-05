@@ -5,7 +5,7 @@
 //  Created by Егор Свистушкин on 29.07.2023.
 //
 
-import Foundation
+import UIKit
 import CoreData
 
 enum TrackerStoreError: Error {
@@ -15,7 +15,6 @@ enum TrackerStoreError: Error {
 class TrackerStore: NSObject {
     
     // MARK: - Private Properties
-    private let colorMarshalling = СolorMarshalling()
     private let scheduleConverter = ScheduleConverter()
     private let context: NSManagedObjectContext
     
@@ -29,25 +28,56 @@ class TrackerStore: NSObject {
     func getTrackerFromCoreData(from trackerCoreData: TrackerCoreData) -> Tracker {
         return Tracker(id: trackerCoreData.trackerId,
                        name: trackerCoreData.name,
-                       color: colorMarshalling.color(from: trackerCoreData.color),
+                       color: UIColor.color(from: trackerCoreData.color),
                        emoji: trackerCoreData.emoji,
-                       schedule: scheduleConverter.convertToArray(string: trackerCoreData.schedule)
+                       schedule: scheduleConverter.convertToArray(string: trackerCoreData.schedule),
+                       isPinned: trackerCoreData.isPinned
         )
     }
     
     func addNewTracker(_ tracker: Tracker, at category: TrackerCategoryCoreData) throws {
         let trackerCoreData = TrackerCoreData(context: context)
-        updateTrackers(trackerCoreData, tracker)
+        updateTracker(trackerCoreData, tracker)
         trackerCoreData.category = category
         try context.save()
     }
     
+    func saveTracker(_ tracker: Tracker, at category: TrackerCategoryCoreData) throws {
+        if let trackerCoreData = getTrackerWithID(tracker.id) {
+            updateTracker(trackerCoreData, tracker)
+            trackerCoreData.category = category
+            try context.save()
+        }
+    }
+
+    func pin(_ isPinned: Bool, tracker: Tracker) throws {
+        if let trackerCoreData = getTrackerWithID(tracker.id) {
+            trackerCoreData.isPinned = isPinned
+            try context.save()
+        }
+    }
+    
+    func getTrackerWithID(_ id: UUID) -> TrackerCoreData? {
+        let request = NSFetchRequest<TrackerCoreData>(entityName: "TrackerCoreData")
+        let idPredicate = NSPredicate(format: "%K == %@", #keyPath(TrackerCoreData.trackerId), id as CVarArg)
+        request.predicate = idPredicate
+        return try? context.fetch(request).first
+    }
+    
+    func deleteTracker(_ tracker: Tracker) throws {
+        if let trackerCoreData = getTrackerWithID(tracker.id) {
+            context.delete(trackerCoreData)
+            try context.save()
+        }
+    }
+    
     // MARK: - Private Methods
-    private func updateTrackers(_ trackerCoreData: TrackerCoreData, _ tracker: Tracker) {
+    private func updateTracker(_ trackerCoreData: TrackerCoreData, _ tracker: Tracker) {
         trackerCoreData.trackerId = tracker.id
         trackerCoreData.name = tracker.name
-        trackerCoreData.color = colorMarshalling.hexString(from: tracker.color)
+        trackerCoreData.color = tracker.color.hexString
         trackerCoreData.emoji = tracker.emoji
         trackerCoreData.schedule = scheduleConverter.convertToString(array: tracker.schedule)
+        trackerCoreData.isPinned = tracker.isPinned
     }
 }

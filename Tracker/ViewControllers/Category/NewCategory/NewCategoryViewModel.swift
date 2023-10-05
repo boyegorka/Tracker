@@ -11,7 +11,13 @@ protocol NewCategoryDelegate: AnyObject  {
     func didCreateCategory()
 }
 
-final class NewCategoryViewModel {
+protocol NewCategoryViewModelProtocol {
+    var categoryName: String? { get set }
+    func createNewCategory() throws
+    func bindIsValidForm(execute: @escaping (Bool) -> ())
+}
+
+final class NewCategoryViewModel: NewCategoryViewModelProtocol {
     
     // MARK: - Public Properties
     private weak var delegate: NewCategoryDelegate?
@@ -35,5 +41,9 @@ final class NewCategoryViewModel {
         guard let categoryName else { return }
         try service.addNewCategory(name: categoryName)
         delegate?.didCreateCategory()
+    }
+    
+    func bindIsValidForm(execute: @escaping (Bool) -> ()) {
+        $isValidForm.bind { execute($0) }
     }
 }

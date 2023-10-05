@@ -21,15 +21,18 @@ final class TabBarController: UITabBarController {
         let presenter = TrackersPresenter()
         presenter.view = vc
         vc.presenter = presenter
-        
         let trackers = UINavigationController(rootViewController: vc)
-        trackers.tabBarItem = UITabBarItem(title: "Трекеры", image: UIImage(systemName: "record.circle.fill"), selectedImage: nil)
+        trackers.tabBarItem = UITabBarItem(title: "trackers".localized, image: UIImage(systemName: "record.circle.fill"), selectedImage: nil)
         return trackers
     }
     
     private func getStatisticViewController() -> UINavigationController {
-        let statistic = UINavigationController(rootViewController: StatisticsViewController())
-        statistic.tabBarItem = UITabBarItem(title: "Статистика", image: UIImage(systemName: "hare.fill"), selectedImage: nil)
+        let vc = StatisticsViewController()
+        let presenter = StatisticsPresenter()
+        presenter.view = vc
+        vc.presenter = presenter
+        let statistic = UINavigationController(rootViewController: vc)
+        statistic.tabBarItem = UITabBarItem(title: "statistics".localized, image: UIImage(systemName: "hare.fill"), selectedImage: nil)
         return statistic
     }
 }

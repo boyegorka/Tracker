@@ -7,17 +7,21 @@
 
 import UIKit
 
-final class NewCategoryViewController: UIViewController {
+protocol NewCategoryViewControllerProtocol: AnyObject {
+    var viewModel: NewCategoryViewModelProtocol { get }
+}
+
+final class NewCategoryViewController: UIViewController, NewCategoryViewControllerProtocol {
     
     // MARK: - Public Properties
-    private var viewModel: NewCategoryViewModel!
+    var viewModel: NewCategoryViewModelProtocol
     
     // MARK: - Private Properties
     private lazy var newCategoryNameTextField: UITextField = {
         let textField = UITextField()
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.clearButtonMode = .always
-        textField.placeholder = "Введите название категории"
+        textField.placeholder = "category.name.placeholder".localized
         textField.delegate = self
         return textField
     }()
@@ -26,7 +30,7 @@ final class NewCategoryViewController: UIViewController {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
         button.layer.cornerRadius = 16
-        button.setTitle("Готово", for: .normal)
+        button.setTitle("ready.button".localized, for: .normal)
         button.backgroundColor = .ypGray
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.setTitleColor(.ypWhite, for: .normal)
@@ -102,14 +106,12 @@ final class NewCategoryViewController: UIViewController {
     
     private func setupNavigationBar() {
         if let navigationBar = navigationController?.navigationBar {
-            navigationBar.topItem?.title = "Новая категория"
+            navigationBar.topItem?.title = "new.category".localized
         }
     }
     
     private func bind() {
-        guard let viewModel else { return }
-        
-        viewModel.$isValidForm.bind { [weak self] value in
+        viewModel.bindIsValidForm { [weak self] value in
             guard let self else { return }
             readyButton.isEnabled = value
             readyButton.backgroundColor = readyButton.isEnabled ? .ypBlack : .ypGray
@@ -118,7 +120,7 @@ final class NewCategoryViewController: UIViewController {
     
     @objc
     private func addNewCategory() throws {
-        try viewModel?.createNewCategory()
+        try viewModel.createNewCategory()
         dismiss(animated: true)
     }
 }
@@ -131,7 +133,7 @@ extension NewCategoryViewController: UITextFieldDelegate {
     
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         if let text = textField.text, let textRange = Range(range, in: text) {
-            viewModel?.categoryName = text.replacingCharacters(in: textRange, with: string)
+            viewModel.categoryName = text.replacingCharacters(in: textRange, with: string)
             return true
         }
         return true

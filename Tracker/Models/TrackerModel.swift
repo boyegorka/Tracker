@@ -13,4 +13,11 @@ struct Tracker {
     let color: UIColor
     let emoji: String
     let schedule: [Int]
+    let isPinned: Bool
+}
+
+extension Tracker {
+    var type: TrackerType {
+        schedule.isEmpty ? .unregularEvent : .habit
+    }
 }

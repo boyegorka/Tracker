@@ -14,7 +14,7 @@ protocol TimetableViewControllerProtocol: AnyObject {
 final class TimetableViewController: UIViewController, TimetableViewControllerProtocol {
     
     // MARK: - Enums
-    enum Contstant {
+    private enum Contstant {
         static let timetableCellIdentifier = "TimetableCell"
     }
     
@@ -60,12 +60,12 @@ final class TimetableViewController: UIViewController, TimetableViewControllerPr
         setupNavigationBar()
         addSubViews()
         contstraintSubviews()
-        readyButton.setTitle("Готово", for: .normal)
+        readyButton.setTitle("ready.button".localized, for: .normal)
     }
     
     private func setupNavigationBar() {
         if let navigationBar = navigationController?.navigationBar {
-            navigationBar.topItem?.title = "Расписание"
+            navigationBar.topItem?.title = "schedule".localized
         }
     }
     

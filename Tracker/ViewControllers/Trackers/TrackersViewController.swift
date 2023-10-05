@@ -16,7 +16,7 @@ protocol TrackersViewControllerProtocol: AnyObject {
 
 final class TrackersViewController: UIViewController, TrackersViewControllerProtocol {
     
-    enum Contstants {
+    private enum Contstants {
         static let cellIdentifier = "TrackerCell"
         static let headerIdentifier = "TrackersHeader"
         static let contentInsets: CGFloat = 16
@@ -30,7 +30,7 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
         
         collectionView.translatesAutoresizingMaskIntoConstraints = false
-        collectionView.backgroundColor = .ypWhite
+        collectionView.backgroundColor = .clear
         collectionView.showsVerticalScrollIndicator = false
         collectionView.dataSource = self
         collectionView.delegate = self
@@ -42,6 +42,9 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
     }()
     
     // MARK: - Private Properties
+    private var alertPresenter: AlertPresenter = AlertPresenter()
+    private var analytics: AnalyticsService = AnalyticsService()
+    
     private lazy var emptyScreenImage: UIImageView = {
         let imageView = UIImageView()
         imageView.image = UIImage(named: "EmptyScreenStar")
@@ -52,7 +55,7 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
     private lazy var emptyScreenText: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = "Что будем отслеживать?"
+        label.text = "trackers.empty.screen.label".localized
         label.font = UIFont.systemFont(ofSize: 12, weight: .medium)
         return label
     }()
@@ -86,11 +89,34 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
         return dateButton
     }()
     
+    private lazy var filtersButton: UIButton = {
+        let button = UIButton()
+        button.setTitle("filters".localized, for: .normal)
+        button.layer.cornerRadius = 16
+        button.backgroundColor = .ypBlue
+        button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
+        button.setTitleColor(.ypWhite, for: .normal)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(pushFiltersViewController), for: .touchUpInside)
+        return button
+    }()
+    
     // MARK: - View Life Cycles
     override func viewDidLoad() {
         super.viewDidLoad()
         presenter?.updateCategories()
+        presenter?.updatePinned()
         setupTrackersScreen()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        analytics.report(event: "open", params: ["screen":"trackers_screen"])
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        analytics.report(event: "close", params: ["screen":"trackers_screen"])
     }
     
     // MARK: - Public Methods
@@ -98,9 +124,10 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
         let isSearch = presenter?.search.isEmpty ?? true
         let isEmpty = presenter?.isEmpty ?? true
         emptyScreenImage.image = isSearch ? UIImage(named: "EmptyScreenStar") : UIImage(named: "EmptyScreenSmileThinking")
-        emptyScreenText.text = isSearch ? "Что будем отслеживать?" : "Ничего не найдено"
+        emptyScreenText.text = isSearch ? "trackers.empty.screen.label".localized : "nothing.found".localized
         emptyScreenView.isHidden = !isEmpty
         trackersCollectionView.isHidden = isEmpty
+        filtersButton.isHidden = isEmpty
     }
     
     func updateView() {
@@ -115,7 +142,7 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
         leftButton.tintColor = .ypBlack
         navigationBar.topItem?.setLeftBarButton(leftButton, animated: true)
         
-        navigationBar.topItem?.title = "Трекеры"
+        navigationBar.topItem?.title = "trackers".localized
         navigationBar.prefersLargeTitles = true
         navigationBar.topItem?.largeTitleDisplayMode = .always
         
@@ -131,11 +158,13 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
         setupNavigationBar()
         addSubviews()
         contstraintSubviews()
+        alertPresenter.viewController = self
     }
     
     private func addSubviews() {
         view.addSubview(trackersCollectionView)
         view.addSubview(emptyScreenView)
+        view.addSubview(filtersButton)
     }
     
     private func contstraintSubviews() {
@@ -149,9 +178,58 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
             emptyScreenView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             emptyScreenView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             emptyScreenView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            
+            filtersButton.heightAnchor.constraint(equalToConstant: 50),
+            filtersButton.widthAnchor.constraint(equalToConstant: 114),
+            filtersButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            filtersButton.topAnchor.constraint(greaterThanOrEqualTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
+            filtersButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
         ])
     }
-
+    
+    private func showNewTracker(state: NewTrackerPresenter.ScreenState, type: TrackerType) {
+        let vc = NewTrackerViewController()
+        let presenter = NewTrackerPresenter(state: state, type: type, categories: presenter?.caregories ?? [])
+        
+        vc.presenter = presenter
+        presenter.view = vc
+        
+        presenter.delegate = self
+        
+        vc.modalPresentationStyle = .formSheet
+        vc.modalTransitionStyle = .coverVertical
+        vc.isModalInPresentation = true
+        let navigationController = UINavigationController(rootViewController: vc)
+        self.present(navigationController, animated: true)
+    }
+    
+    private func editTracker(_ tracker: Tracker, indexPath: IndexPath) {
+        guard let viewModel = presenter?.trackerViewModel(at: indexPath),
+              let category = presenter?.categoryName(section: indexPath.section)
+        else { return }
+        let state = NewTrackerPresenter.ScreenState.edit(tracker: tracker, category: category, daysCounter: viewModel.daysCounter)
+        showNewTracker(state: state, type: viewModel.tracker.type)
+    }
+    
+    private func pinTracker(_ tracker: Tracker) {
+        presenter?.pinTracker(tracker: tracker)
+    }
+    
+    @objc
+    private func pushFiltersViewController() {
+        let vc = FiltersViewController()
+        let presenter = FiltersPresenter(selectedFilter: presenter?.selectedFilter, delegate: self)
+        
+        vc.presenter = presenter
+        presenter.view = vc
+        
+        vc.modalTransitionStyle = .coverVertical
+        vc.modalPresentationStyle = .formSheet
+        let navigationController = UINavigationController(rootViewController: vc)
+        self.present(navigationController, animated: true)
+        analytics.report(event: "click", params: ["screen":"trackers_screen", "item":"filters"])
+    }
+    
     @objc
     private func pushTrackerTypeViewController() {
         let vc = TrackerTypeViewController()
@@ -165,6 +243,7 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
         vc.modalPresentationStyle = .formSheet
         let navigationController = UINavigationController(rootViewController: vc)
         self.present(navigationController, animated: true)
+        analytics.report(event: "click", params: ["screen":"trackers_screen", "item":"add_track"])
     }
     
     @objc
@@ -177,24 +256,16 @@ final class TrackersViewController: UIViewController, TrackersViewControllerProt
 extension TrackersViewController: TrackerTypeDelegate {
     
     func didSelectType(_ type: TrackerType) {
-        let vc = NewTrackerViewController()
-        let presenter = NewTrackerPresenter(type: type, categories: presenter?.caregories ?? [])
-        
-        vc.presenter = presenter
-        presenter.view = vc
-        
-        presenter.delegate = self
-        
-        vc.modalPresentationStyle = .formSheet
-        vc.modalTransitionStyle = .coverVertical
-        vc.isModalInPresentation = true
-        let navigationController = UINavigationController(rootViewController: vc)
-        self.present(navigationController, animated: true)
+        showNewTracker(state: .new, type: type)
     }
 }
 
 // MARK: - NewHabitDelegate
 extension TrackersViewController: NewHabitDelegate {
+    
+    func saveTracker(_ tracker: Tracker, at category: String) {
+        presenter?.saveTracker(tracker, at: category)
+    }
     
     func didCreateTracker(_ tracker: Tracker, at category: String) {
         presenter?.addTracker(tracker, at: category)
@@ -237,8 +308,61 @@ extension TrackersViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         
         guard let view = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: Contstants.headerIdentifier, for: indexPath) as? SupplementaryView else { return UICollectionReusableView() }
-        view.title.text = presenter?.titleInSection(section: indexPath.section)
+        view.title.text = presenter?.categoryName(section: indexPath.section)
         return view
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemsAt indexPaths: [IndexPath], point: CGPoint) -> UIContextMenuConfiguration? {
+        
+        guard !indexPaths.isEmpty,
+              let tracker = presenter?.trackerViewModel(at: indexPaths[0])?.tracker else { return nil }
+        
+        let context = UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { (action) -> UIMenu? in
+            
+            let pin = UIAction(title: tracker.isPinned ? "unpin".localized : "pin".localized,
+                               image: UIImage(systemName: "pin"),
+                               identifier: nil,
+                               discoverabilityTitle: nil,
+                               state: .off) { [weak self] (_) in
+                guard let self = self else { return }
+                self.pinTracker(tracker)
+            }
+            let edit = UIAction(title: "edit".localized,
+                                image: UIImage(systemName: "square.and.pencil"),
+                                identifier: nil,
+                                discoverabilityTitle: nil,
+                                state: .off) { [weak self] (_) in
+                guard let self = self else { return }
+                self.editTracker(tracker, indexPath: indexPaths[0])
+                analytics.report(event: "click", params: ["screen":"trackers_screen", "item":"edit"])
+            }
+            let delete = UIAction(title: "delete".localized,
+                                  image: UIImage(systemName: "trash"),
+                                  identifier: nil,
+                                  discoverabilityTitle: nil,
+                                  attributes: .destructive,
+                                  state: .off) { [weak self] (_) in
+                guard let self = self else { return }
+                
+                let viewModel = AlertModel(alertStyle: .actionSheet, title: "Уверены что хотите удалить трекер?", message: nil, buttonText: "Удалить") { [weak self] in
+                    guard let self = self else { return }
+                    self.presenter?.deleteTracker(tracker)
+                }
+                self.alertPresenter.show(result: viewModel)
+                analytics.report(event: "click", params: ["screen":"trackers_screen", "item":"delete"])
+            }
+            
+            return UIMenu(title: "", image: nil, identifier: nil, options: UIMenu.Options.displayInline, children: [pin,edit,delete])
+            
+        }
+        return context
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, contextMenuConfiguration configuration: UIContextMenuConfiguration, highlightPreviewForItemAt indexPath: IndexPath) -> UITargetedPreview? {
+        
+        guard let cell = collectionView.cellForItem(at: indexPath) as? TrackerCollectionViewCell else { return nil }
+        
+        return UITargetedPreview(view: cell.rectangleView)
     }
 }
 
@@ -273,5 +397,11 @@ extension TrackersViewController: UISearchBarDelegate {
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         presenter?.search = ""
+    }
+}
+
+extension TrackersViewController: FiltersDelegate {
+    func didSelectFilter(_ name: String) {
+        presenter?.selectedFilter = name
     }
 }

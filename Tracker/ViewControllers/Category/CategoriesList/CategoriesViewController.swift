@@ -11,15 +11,19 @@ protocol CategoriesUpdateTableViewDelegate: AnyObject {
     func updateTableView()
 }
 
-final class CategoriesViewController: UIViewController {
+protocol CategoriesViewControllerProtocol: AnyObject {
+    var viewModel: CategoriesViewModelProtocol { get }
+}
+
+final class CategoriesViewController: UIViewController, CategoriesViewControllerProtocol {
     
     // MARK: - Enums
-    enum Contstant {
+    private enum Contstant {
         static let categoryCellIdentifier = "CategoryCell"
     }
     
     // MARK: - Public Properties
-    private var viewModel: CategoriesViewModel!
+    var viewModel: CategoriesViewModelProtocol
     
     // MARK: - Private Properties
     private lazy var categoriesTableView: UITableView = {
@@ -43,7 +47,7 @@ final class CategoriesViewController: UIViewController {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
         button.layer.cornerRadius = 16
-        button.setTitle("Добавить категорию", for: .normal)
+        button.setTitle("add.category.button".localized, for: .normal)
         button.backgroundColor = .ypBlack
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.setTitleColor(.ypWhite, for: .normal)
@@ -64,7 +68,7 @@ final class CategoriesViewController: UIViewController {
         label.textAlignment = .center
         label.numberOfLines = 0
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = "Привычки и события \n можно объединить по смыслу"
+        label.text = "categories.empty.screen.label".localized
         label.font = UIFont.systemFont(ofSize: 12, weight: .medium)
         return label
     }()
@@ -101,7 +105,7 @@ final class CategoriesViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupScreen()
-        viewModel?.getCategories()
+        viewModel.getCategories()
     }
     
     // MARK: - Private Methods
@@ -141,18 +145,16 @@ final class CategoriesViewController: UIViewController {
     
     private func setupNavigationBar() {
         if let navigationBar = navigationController?.navigationBar {
-            navigationBar.topItem?.title = "Категория"
+            navigationBar.topItem?.title = "category".localized
         }
     }
     
     private func bind() {
-        guard let viewModel else { return }
-        
-        viewModel.$categories.bind { [weak self] _ in
+        viewModel.bindCategories { [weak self] _ in
             self?.categoriesTableView.reloadData()
         }
         
-        viewModel.$isEmpty.bind { [weak self] value in
+        viewModel.bindIsEmpty { [weak self] value in
             self?.emptyScreenView.isHidden = !value
             self?.categoriesTableView.isHidden = value
         }
@@ -178,21 +180,21 @@ final class CategoriesViewController: UIViewController {
 // MARK: - UITableViewDataSource
 extension CategoriesViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel?.categories.count ?? 0
+        return viewModel.categories.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: Contstant.categoryCellIdentifier) as? TableViewCell
         else { return UITableViewCell() }
         
-        let category = viewModel?.categories[indexPath.row]
+        let category = viewModel.categories[indexPath.row]
         
         cell.tintColor = .ypBlue
         cell.backgroundColor = .ypBackground
         cell.textLabel?.text = category
         
         
-        if category == viewModel?.selectedCategoryName {
+        if category == viewModel.selectedCategoryName {
             cell.accessoryType = .checkmark
         } else {
             cell.accessoryType = .none
@@ -210,19 +212,19 @@ extension CategoriesViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        if let selectedCategory = viewModel?.selectedCategoryName,
-           let index = viewModel?.categories.firstIndex(of: selectedCategory){
+        if let selectedCategory = viewModel.selectedCategoryName,
+           let index = viewModel.categories.firstIndex(of: selectedCategory){
             let cell = tableView.cellForRow(at: IndexPath(row: index, section: 0) )
             cell?.accessoryType = .none
         }
         
         let cell = tableView.cellForRow(at: indexPath)
         
-        guard let category = viewModel?.categories[indexPath.row] else { return }
+        let category = viewModel.categories[indexPath.row]
         
         cell?.accessoryType = .checkmark
         
-        viewModel?.delegate?.didSelectCategory(category)
+        viewModel.didSelectCategory(category)
         
         tableView.deselectRow(at: indexPath, animated: true)
         
@@ -237,6 +239,6 @@ extension CategoriesViewController: UITableViewDelegate {
 // MARK: - NewCategoryDelegate
 extension CategoriesViewController: NewCategoryDelegate {
     func didCreateCategory() {
-        viewModel?.getCategories()
+        viewModel.getCategories()
     }
 }

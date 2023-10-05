@@ -14,7 +14,8 @@ protocol NewTrackerViewControllerProtocol: AnyObject {
 final class NewTrackerViewController: UIViewController, NewTrackerViewControllerProtocol {
     
     // MARK: - Enums
-    enum Constant {
+    private enum Constant {
+        static let daysCounterIdentifier = "daysCounter"
         static let textFieldCellIdentifier = "TextFieldCell"
         static let planningCellIdentifier = "PlaningCell"
         static let emojiCellIdentifier = "EmojiCell"
@@ -22,12 +23,14 @@ final class NewTrackerViewController: UIViewController, NewTrackerViewController
     }
     
     enum Section: Int, CaseIterable {
+        case daysCounter
         case textField
         case planning
         case emoji
         case color
         
         enum Row {
+            case daysCounter
             case textField
             case category
             case schedule
@@ -39,9 +42,20 @@ final class NewTrackerViewController: UIViewController, NewTrackerViewController
     // MARK: - Public Properties
     var presenter: NewTrackerPresenterProtocol?
     
+    var sections: [Section] {
+        switch presenter?.state {
+        case .new:
+            return [.textField, .planning, .emoji, .color]
+        case .edit:
+            return [.daysCounter, .textField, .planning, .emoji, .color]
+        case nil:
+            return []
+        }
+    }
+    
     // MARK: - Private Properties
     private let emojis: [String] = ["🙂", "😻", "🌺", "🐶", "❤️", "😱", "😇", "😡", "🥶", "🤔", "🙌", "🍔", "🥦", "🏓", "🥇", "🎸", "🏝️", "😪"]
-    private let colors: [UIColor?] = [.ypSelection1, .ypSelection2, .ypSelection3, .ypSelection4, .ypSelection5, .ypSelection6, .ypSelection7, .ypSelection8, .ypSelection9, .ypSelection10, .ypSelection11, .ypSelection12, .ypSelection13, .ypSelection14, .ypSelection15, .ypSelection16, .ypSelection17, .ypSelection18]
+    private let colors: [UIColor] = [.ypSelection1, .ypSelection2, .ypSelection3, .ypSelection4, .ypSelection5, .ypSelection6, .ypSelection7, .ypSelection8, .ypSelection9, .ypSelection10, .ypSelection11, .ypSelection12, .ypSelection13, .ypSelection14, .ypSelection15, .ypSelection16, .ypSelection17, .ypSelection18]
     
     private lazy var tableView: UITableView = {
         let planningTableView = UITableView(frame: .zero, style: .insetGrouped)
@@ -94,7 +108,6 @@ final class NewTrackerViewController: UIViewController, NewTrackerViewController
     override func viewDidLoad() {
         super.viewDidLoad()
         setupNewHabitScreen()
-        tableView.reloadData()
     }
     
     // MARK: - Private Methods
@@ -102,6 +115,7 @@ final class NewTrackerViewController: UIViewController, NewTrackerViewController
         self.hideKeyboardOnTap()
         view.backgroundColor = .ypWhite
         addSubViews()
+        tableView.register(DaysCounterCell.self, forCellReuseIdentifier: Constant.daysCounterIdentifier)
         tableView.register(TextFieldCell.self, forCellReuseIdentifier: Constant.textFieldCellIdentifier)
         tableView.register(TableViewCell.self, forCellReuseIdentifier: Constant.planningCellIdentifier)
         tableView.register(CollectionCell.self, forCellReuseIdentifier: Constant.emojiCellIdentifier)
@@ -109,8 +123,16 @@ final class NewTrackerViewController: UIViewController, NewTrackerViewController
         
         setupNavigationBar()
         
-        cancelButton.setTitle("Отменить", for: .normal)
-        createButton.setTitle("Создать", for: .normal)
+        cancelButton.setTitle("cancel.button".localized, for: .normal)
+        switch presenter?.state {
+        case .edit:
+            createButton.setTitle("save.button".localized, for: .normal)
+        case .new:
+            createButton.setTitle("create.button".localized, for: .normal)
+        case .none:
+            return
+        }
+        
         updateButtonState()
     }
     
@@ -138,6 +160,8 @@ final class NewTrackerViewController: UIViewController, NewTrackerViewController
     
     private func rowsForSection(_ type: Section) -> [Section.Row] {
         switch type {
+        case .daysCounter:
+            return [.daysCounter]
         case .textField:
             return [.textField]
         case .planning:
@@ -156,10 +180,15 @@ final class NewTrackerViewController: UIViewController, NewTrackerViewController
         }
     }
     
+    private func daysCounterCell(at indexPath: IndexPath) -> UITableViewCell {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: Constant.daysCounterIdentifier) as? DaysCounterCell else { return UITableViewCell() }
+        cell.text = presenter?.daysCounter?.localizeNumbers("NumberOfDays")
+        return cell
+    }
+    
     private func textFieldCell(at indexPath: IndexPath, placeholder: String) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: Constant.textFieldCellIdentifier) as? TextFieldCell else {
-            return UITableViewCell()
-        }
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: Constant.textFieldCellIdentifier) as? TextFieldCell else { return UITableViewCell() }
+        cell.text = presenter?.trackerName
         cell.placeholder = placeholder
         cell.delegate = self
         return cell
@@ -177,6 +206,9 @@ final class NewTrackerViewController: UIViewController, NewTrackerViewController
         guard let cell = tableView.dequeueReusableCell(withIdentifier: Constant.emojiCellIdentifier) as? CollectionCell else { return UITableViewCell() }
         cell.delegate = self
         cell.type = .emoji(items: emojis)
+        if let emoji = presenter?.emoji {
+            cell.selectedIndex = emojis.firstIndex(of: emoji)
+        }
         return cell
     }
     
@@ -184,6 +216,9 @@ final class NewTrackerViewController: UIViewController, NewTrackerViewController
         guard let cell = tableView.dequeueReusableCell(withIdentifier: Constant.colorCellIdentifier) as? CollectionCell else { return UITableViewCell() }
         cell.delegate = self
         cell.type = .color(items: colors)
+        if let color = presenter?.color {
+            cell.selectedIndex = colors.map{ $0.hexString }.firstIndex(of: color.hexString)
+        }
         return cell
     }
     
@@ -221,7 +256,7 @@ final class NewTrackerViewController: UIViewController, NewTrackerViewController
     
     @objc
     private func createHabit() {
-        presenter?.createNewTracker()
+        presenter?.saveTracker()
         dismiss(animated: true)
     }
 }
@@ -232,9 +267,9 @@ extension NewTrackerViewController: TimetableDelegate {
     func didSelect(weekdays: [Int]) {
         presenter?.schedule = weekdays
         updateButtonState()
-        let section = Section.planning
-        if let row = rowsForSection(section).firstIndex(of: Section.Row.schedule) {
-            tableView.reloadRows(at: [IndexPath(row: row, section: section.rawValue)], with: .none)
+        if let section = sections.firstIndex(of: Section.planning),
+           let row = rowsForSection(Section.planning).firstIndex(of: Section.Row.schedule) {
+            tableView.reloadRows(at: [IndexPath(row: row, section: section)], with: .none)
         }
     }
 }
@@ -244,9 +279,9 @@ extension NewTrackerViewController: CategoriesDelegate {
     func didSelectCategory(_ name: String) {
         presenter?.selectedCategory = name
         updateButtonState()
-        let section = Section.planning
-        if let row = rowsForSection(section).firstIndex(of: Section.Row.category) {
-            tableView.reloadRows(at: [IndexPath(row: row, section: section.rawValue)], with: .none)
+        if let section = sections.firstIndex(of: Section.planning),
+           let row = rowsForSection(Section.planning).firstIndex(of: Section.Row.category) {
+            tableView.reloadRows(at: [IndexPath(row: row, section: section)], with: .none)
         }
     }
 }
@@ -283,18 +318,17 @@ extension NewTrackerViewController: CollectionCellDelegate {
 extension NewTrackerViewController: UITableViewDataSource {
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        Section.allCases.count
+        sections.count
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        guard let section = Section(rawValue: section) else { return 0 }
-        return rowsForSection(section).count
+        return rowsForSection(sections[section]).count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let section = Section(rawValue: indexPath.section) else { return UITableViewCell() }
-        switch rowsForSection(section)[indexPath.row] {
-            
+        switch rowsForSection(sections[indexPath.section])[indexPath.row] {
+        case .daysCounter:
+            return daysCounterCell(at: indexPath)
         case .textField:
             return textFieldCell(at: indexPath, placeholder: "Введите название трекера")
         case .category:
@@ -313,9 +347,7 @@ extension NewTrackerViewController: UITableViewDataSource {
 extension NewTrackerViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard let section = Section(rawValue: indexPath.section) else { return }
-        switch rowsForSection(section)[indexPath.row] {
-            
+        switch rowsForSection(sections[indexPath.section])[indexPath.row] {
         case .category:
             showCategory()
         case .schedule:
@@ -327,9 +359,14 @@ extension NewTrackerViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        guard let section = Section(rawValue: indexPath.section) else { return 0 }
-        switch rowsForSection(section)[indexPath.row] {
-            
+        switch rowsForSection(sections[indexPath.section])[indexPath.row] {
+        case .daysCounter:
+            switch presenter?.state {
+            case .edit:
+                return 50
+            default:
+                return 0
+            }
         case .textField, .category, .schedule:
             return 75
         case .emoji, .color:
