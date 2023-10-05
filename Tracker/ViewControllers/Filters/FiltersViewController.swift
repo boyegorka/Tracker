@@ -88,19 +88,6 @@ extension FiltersViewController: UITableViewDataSource {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: Contstants.filterCellIdentifier) as? TableViewCell
         else { return UITableViewCell() }
         
-//        let category = viewModel.categories[indexPath.row]
-//        
-//        cell.tintColor = .ypBlue
-//        cell.backgroundColor = .ypBackground
-//        cell.textLabel?.text = category
-//        
-//        
-//        if category == viewModel.selectedCategoryName {
-//            cell.accessoryType = .checkmark
-//        } else {
-//            cell.accessoryType = .none
-//        }
-        
         return cell
     }
 }
@@ -109,27 +96,6 @@ extension FiltersViewController: UITableViewDataSource {
 extension FiltersViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 75
-    }
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        
-//        if let selectedCategory = viewModel.selectedCategoryName,
-//           let index = viewModel.categories.firstIndex(of: selectedCategory){
-//            let cell = tableView.cellForRow(at: IndexPath(row: index, section: 0) )
-//            cell?.accessoryType = .none
-//        }
-//        
-//        let cell = tableView.cellForRow(at: indexPath)
-//        
-//        let category = viewModel.categories[indexPath.row]
-//        
-//        cell?.accessoryType = .checkmark
-//        
-//        viewModel.didSelectCategory(category)
-//        
-//        tableView.deselectRow(at: indexPath, animated: true)
-//        
-//        self.dismiss(animated: true)
     }
     
     func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {

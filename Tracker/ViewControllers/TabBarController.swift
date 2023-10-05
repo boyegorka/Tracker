@@ -9,9 +9,6 @@ import UIKit
 
 final class TabBarController: UITabBarController {
     
-    // MARK: - Private Properties
-    private var analytics: AnalyticsService = AnalyticsService()
-    
     // MARK: - View Life Cycles
     override func viewDidLoad() {
         super.viewDidLoad()
