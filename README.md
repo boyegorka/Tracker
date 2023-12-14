@@ -1,5 +1,7 @@
 # Tracker
 
+https://github.com/boyegorka/Tracker/assets/78556508/4f374385-28d9-4142-9180-33d2b6cffa32
+
 ## Ссылки
 - [Дизайн](https://www.figma.com/file/owAO4CAPTJdpM1BZU5JHv7/Tracker-(YP)?t=SZDLmkWeOPX4y6mp-0)
 
@@ -27,3 +29,7 @@
 - Редактирование и удаление категории
 - Просмотр статистики
 - Темная тема
+
+## Предстоит доделать
+- Экран с фильтрами
+- Добавить больше статистики
